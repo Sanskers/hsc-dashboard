@@ -6,6 +6,21 @@
   <title>HSC Progress Dashboard</title>
 
   <style>
+ /* ───────────────────────────────────────────────────────────────────────── */
+  /* Add this “body” rule at the very top of your style block: */
+  body {
+    background-image: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-color: #f5f5f5; /* fallback if image fails */
+    margin: 0;    /* (you already have this) */
+    padding: 0;   /* (you already have this) */
+    font-family: Arial, sans-serif;  /* (you already have this) */
+    color: #333;  /* (you already have this) */
+  }
+
     /* ───────────────────────────────────────────────────────────────────────── */
     /* 1) Basic Reset & Body Styles */
     body, html {
@@ -185,152 +200,157 @@
     <div id="survivorsGrid" class="survivors-grid" style="display: none;"></div>
   </div>
 
-  <script>
-    /**************************************************************
-     * 1) Configuration: Paste your two CSV URLs here
-     **************************************************************/
-    const CSV_PLAYERS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';     // e.g. https://docs.google.com/spreadsheets/d/.../pub?gid=0&output=csv
-    const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv'; // e.g. https://docs.google.com/spreadsheets/d/.../pub?gid=123456789&output=csv
+ <script>
+  /**************************************************************
+   * 1) Configuration: Paste your two CSV URLs here
+   **************************************************************/
+  const CSV_PLAYERS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';     // e.g. https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv
+  const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv'; // e.g. https://docs.google.com/spreadsheets/d/.../pub?gid=123456789&single=true&output=csv
 
-    /**************************************************************
-     * 2) Simple CSV Parser (no quoted‐field support)
-     **************************************************************/
-    function parseCSV(text) {
-      const lines = text.trim().split('\n');
-      const headers = lines[0].split(',');
-      const records = [];
+  /**************************************************************
+   * 2) Simple CSV Parser (no quoted‐field support)
+   **************************************************************/
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',');
+    const records = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim() === '') continue;  // skip empty lines
-        const row = lines[i].split(',');
-        const obj = {};
-        headers.forEach((h, idx) => {
-          obj[h.trim()] = row[idx] ? row[idx].trim() : '';
-        });
-        records.push(obj);
-      }
-      return records;
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === '') continue;  // skip empty lines
+      const row = lines[i].split(',');
+      const obj = {};
+      headers.forEach((h, idx) => {
+        obj[h.trim()] = row[idx] ? row[idx].trim() : '';
+      });
+      records.push(obj);
     }
+    return records;
+  }
 
-    /**************************************************************
-     * 3) Main: Fetch Both CSVs → Parse → Render
-     **************************************************************/
-    async function loadAndRender() {
-      try {
-        // 3a) Fetch players CSV & survivors CSV in parallel
-        const [respPlayers, respSurvivors] = await Promise.all([
-          fetch(CSV_PLAYERS),
-          fetch(CSV_SURVIVORS)
-        ]);
+  /**************************************************************
+   * 3) Main: Fetch Both CSVs → Parse → Render
+   **************************************************************/
+  async function loadAndRender() {
+    try {
+      // 3a) Fetch players CSV & survivors CSV in parallel
+      const [respPlayers, respSurvivors] = await Promise.all([
+        fetch(CSV_PLAYERS),
+        fetch(CSV_SURVIVORS)
+      ]);
 
-      
-        if (!respSurvivors.ok) {
-          throw new Error(`Failed to fetch survivors data (status ${respSurvivors.status})`);
+      if (!respPlayers.ok) {
+        throw new Error(`Failed to fetch players data (status ${respPlayers.status})`);
+      }
+      if (!respSurvivors.ok) {
+        throw new Error(`Failed to fetch survivors data (status ${respSurvivors.status})`);
+      }
+
+      const textPlayers = await respPlayers.text();
+      const textSurvivors = await respSurvivors.text();
+
+      const playersData = parseCSV(textPlayers);
+      const survivorsData = parseCSV(textSurvivors);
+
+      // 3b) Hide spinner
+      document.getElementById('loading').style.display = 'none';
+
+      // 3c) Render “Players” section
+      const pGrid = document.getElementById('playersGrid');
+      pGrid.style.display = 'flex';
+
+      playersData.forEach(row => {
+        const {
+          Player,
+          Survivor,
+          ImageURL,
+          Rank,
+          PerksAllowed
+        } = row; // Note: “Status” has been removed from here
+
+        // Create one player‐card
+        const card = document.createElement('div');
+        card.className = 'player-card';
+
+        // Portrait image
+        const img = document.createElement('img');
+        img.src = ImageURL || '';
+        img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+        card.appendChild(img);
+
+        // Card content
+        const content = document.createElement('div');
+        content.className = 'player-card-content';
+
+        // Player name
+        const nameEl = document.createElement('div');
+        nameEl.className = 'player-name';
+        nameEl.textContent = Player || 'Unknown Player';
+        content.appendChild(nameEl);
+
+        // Survivor
+        const survEl = document.createElement('div');
+        survEl.className = 'field';
+        survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
+        content.appendChild(survEl);
+
+        // Rank
+        const rankEl = document.createElement('div');
+        rankEl.className = 'field';
+        rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
+        content.appendChild(rankEl);
+
+        // PerksAllowed
+        const perksEl = document.createElement('div');
+        perksEl.className = 'field';
+        perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+        content.appendChild(perksEl);
+
+        // (Status block removed entirely for players here)
+
+        card.appendChild(content);
+        pGrid.appendChild(card);
+      });
+
+      // 3d) Render “All Survivors” section
+      const sGrid = document.getElementById('survivorsGrid');
+      sGrid.style.display = 'grid';
+
+      survivorsData.forEach(row => {
+        const { Survivor, Status, ImageURL } = row;
+
+        // One survivor‐card (smaller)
+        const card = document.createElement('div');
+        card.className = 'survivor-card';
+
+        // Portrait
+        const img = document.createElement('img');
+        img.src = ImageURL || '';
+        img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+        card.appendChild(img);
+
+        // Survivor’s name underneath
+        const nameEl = document.createElement('div');
+        nameEl.className = 'survivor-name';
+        nameEl.textContent = Survivor || '-';
+        if (Status && Status.toLowerCase() === 'dead') {
+          nameEl.style.color = '#c0392b'; // red for dead
+        } else {
+          nameEl.style.color = '#27ae60'; // green for alive
         }
+        card.appendChild(nameEl);
 
-        const textPlayers = await respPlayers.text();
-        const textSurvivors = await respSurvivors.text();
+        sGrid.appendChild(card);
+      });
 
-        const playersData = parseCSV(textPlayers);
-        const survivorsData = parseCSV(textSurvivors);
-
-        // 3b) Hide spinner
-        document.getElementById('loading').style.display = 'none';
-
-        // 3c) Render “Players” section
-        const pGrid = document.getElementById('playersGrid');
-        pGrid.style.display = 'flex';
-
-        playersData.forEach(row => {
-          const {
-            Player,
-            Survivor,
-            ImageURL,
-            Rank,
-            PerksAllowed
-          } = row;
-
-          // Create one player‐card
-          const card = document.createElement('div');
-          card.className = 'player-card';
-
-          // Portrait image
-          const img = document.createElement('img');
-          img.src = ImageURL || '';
-          img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
-          card.appendChild(img);
-
-          // Card content
-          const content = document.createElement('div');
-          content.className = 'player-card-content';
-
-          // Player name
-          const nameEl = document.createElement('div');
-          nameEl.className = 'player-name';
-          nameEl.textContent = Player || 'Unknown Player';
-          content.appendChild(nameEl);
-
-          // Survivor
-          const survEl = document.createElement('div');
-          survEl.className = 'field';
-          survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
-          content.appendChild(survEl);
-
-          // Rank
-          const rankEl = document.createElement('div');
-          rankEl.className = 'field';
-          rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
-          content.appendChild(rankEl);
-
-          // PerksAllowed
-          const perksEl = document.createElement('div');
-          perksEl.className = 'field';
-          perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-          content.appendChild(perksEl);
-
-    
-        // 3d) Render “All Survivors” section
-        const sGrid = document.getElementById('survivorsGrid');
-        sGrid.style.display = 'grid';
-
-        survivorsData.forEach(row => {
-          const { Survivor, Status, ImageURL } = row;
-
-          // One survivor‐card (smaller)
-          const card = document.createElement('div');
-          card.className = 'survivor-card';
-
-          // Portrait
-          const img = document.createElement('img');
-          img.src = ImageURL || '';
-          img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
-          card.appendChild(img);
-
-          // Survivor’s name underneath
-          const nameEl = document.createElement('div');
-          nameEl.className = 'survivor-name';
-          nameEl.textContent = Survivor || '-';
-          if (Status && Status.toLowerCase() === 'dead') {
-            nameEl.style.color = '#c0392b'; // red for dead
-          } else {
-            nameEl.style.color = '#27ae60'; // green for alive
-          }
-          card.appendChild(nameEl);
-
-          sGrid.appendChild(card);
-        });
-
-      } catch (err) {
-        // Show error message if something goes wrong
-        document.getElementById('loading').style.display = 'none';
-        const errorEl = document.getElementById('error');
-        errorEl.style.display = 'block';
-        errorEl.textContent = 'Error loading data: ' + err.message;
-      }
+    } catch (err) {
+      // Show error message if something goes wrong
+      document.getElementById('loading').style.display = 'none';
+      const errorEl = document.getElementById('error');
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'Error loading data: ' + err.message;
     }
+  }
 
-    // Run when page loads
-    document.addEventListener('DOMContentLoaded', loadAndRender);
-  </script>
-</body>
-</html>
+  // Run when page loads
+  document.addEventListener('DOMContentLoaded', loadAndRender);
+</script>
