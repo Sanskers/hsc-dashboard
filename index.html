@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HSC Progress Dashboard</title>
+
+  <style>
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 1) Basic Reset & Body Styles */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 2) Container & Page Title */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 3) Card Grid Layout */
+    .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 4) Individual Card */
+    .card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease-in-out;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background-color: #ddd;
+    }
+    .card-content {
+      padding: 12px 16px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .player-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      text-align: center;
+      color: #2c3e50;
+    }
+    .field {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .field span {
+      font-weight: 600;
+    }
+    .status-alive {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    .status-dead {
+      color: #c0392b;
+      font-weight: bold;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 5) Spinner While Loading */
+    #loading {
+      text-align: center;
+      margin-top: 60px;
+    }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 6) Error Message */
+    #error {
+      text-align: center;
+      color: #e74c3c;
+      margin-top: 40px;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Hardcore Survivor Challenge Progress</h1>
+
+    <!-- Loading Spinner -->
+    <div id="loading">
+      <div class="spinner"></div>
+      <div>Loading data…</div>
+    </div>
+
+    <!-- Error Message (hidden by default) -->
+    <div id="error" style="display: none;"></div>
+
+    <!-- Card Grid (populated via JS) -->
+    <div id="cardGrid" class="card-grid" style="display: none;"></div>
+  </div>
+
+  <script>
+    /**************************************************************
+     * 1) Configuration: Paste your published CSV URL here
+     **************************************************************/
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
+    // Example: 
+    // const CSV_URL = 'https://docs.google.com/spreadsheets/d/1AbcXyZ12345qRsTUVwXyz/pub?output=csv';
+
+    /**************************************************************
+     * 2) Simple CSV Parser
+     *    (Splits on newline & commas; fields must not contain commas.)
+     **************************************************************/
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',');
+      const records = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim() === '') continue;
+        const row = lines[i].split(',');
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h.trim()] = row[idx] ? row[idx].trim() : '';
+        });
+        records.push(obj);
+      }
+      return records;
+    }
+
+    /**************************************************************
+     * 3) Main: Fetch CSV → Parse → Render Cards
+     **************************************************************/
+    async function loadAndRender() {
+      try {
+        // 3a) Fetch CSV
+        const response = await fetch(CSV_URL);
+        if (!response.ok) {
+          throw new Error(`Network response was not OK (status ${response.status})`);
+        }
+        const csvText = await response.text();
+
+        // 3b) Parse into array of { Player, Survivor, Status, ImageURL, Rank, PerksAllowed }
+        const data = parseCSV(csvText);
+        if (data.length === 0) {
+          throw new Error('No data found in the CSV.');
+        }
+
+        // 3c) Hide spinner, show grid
+        document.getElementById('loading').style.display = 'none';
+        const grid = document.getElementById('cardGrid');
+        grid.style.display = 'flex';
+
+        // 3d) Build a card for each row
+        data.forEach((row) => {
+          const {
+            Player,
+            Survivor,
+            Status,
+            ImageURL,
+            Rank,
+            PerksAllowed
+          } = row;
+
+          // Card container
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          // Portrait
+          const img = document.createElement('img');
+          img.src = ImageURL || '';
+          img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+          card.appendChild(img);
+
+          // Content wrapper
+          const content = document.createElement('div');
+          content.className = 'card-content';
+
+          // Player name
+          const nameEl = document.createElement('div');
+          nameEl.className = 'player-name';
+          nameEl.textContent = Player || 'Unknown Player';
+          content.appendChild(nameEl);
+
+          // Survivor
+          const survEl = document.createElement('div');
+          survEl.className = 'field';
+          survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
+          content.appendChild(survEl);
+
+          // Rank
+          const rankEl = document.createElement('div');
+          rankEl.className = 'field';
+          rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
+          content.appendChild(rankEl);
+
+          // PerksAllowed
+          const perksEl = document.createElement('div');
+          perksEl.className = 'field';
+          perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+          content.appendChild(perksEl);
+
+          // Status (green if Alive, red if Dead)
+          const statusEl = document.createElement('div');
+          statusEl.className = 'field';
+          const statusSpan = document.createElement('span');
+          statusSpan.textContent = Status || '-';
+          statusSpan.className = (Status && Status.toLowerCase() === 'alive')
+            ? 'status-alive'
+            : 'status-dead';
+          statusEl.innerHTML = `<span>Status:</span> `;
+          statusEl.appendChild(statusSpan);
+          content.appendChild(statusEl);
+
+          card.appendChild(content);
+          grid.appendChild(card);
+        });
+
+      } catch (err) {
+        document.getElementById('loading').style.display = 'none';
+        const errorEl = document.getElementById('error');
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Error loading data: ' + err.message;
+      }
+    }
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', loadAndRender);
+  </script>
+</body>
+</html>
