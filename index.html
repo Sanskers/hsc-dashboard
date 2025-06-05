@@ -223,9 +223,7 @@
           fetch(CSV_SURVIVORS)
         ]);
 
-        if (!respPlayers.ok) {
-          throw new Error(`Failed to fetch players data (status ${respPlayers.status})`);
-        }
+      
         if (!respSurvivors.ok) {
           throw new Error(`Failed to fetch survivors data (status ${respSurvivors.status})`);
         }
@@ -247,7 +245,6 @@
           const {
             Player,
             Survivor,
-            Status,
             ImageURL,
             Rank,
             PerksAllowed
