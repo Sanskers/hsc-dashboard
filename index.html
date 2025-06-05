@@ -116,13 +116,18 @@
 
     /* ───────────────────────────────────────────────────────────────────────── */
     /* 4) “All Survivors” Grid (smaller cards, wrap nicely) */
-    .survivors-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 12px;
-      margin-top: 10px;
-      justify-items: center;
-    }
+   .survivors-grid {
+  display: grid;
+  /* auto-fit makes empty columns collapse, so the last row will not be left-aligned */
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+
+  /* center each item in its cell */
+  justify-items: center;
+  /* center the entire grid’s content (including the final partial row) */
+  justify-content: center;
+}
     .survivor-card {
       background-color: #fff;
       border-radius: 6px;
