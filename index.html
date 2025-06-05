@@ -202,21 +202,22 @@
 
  <script>
   /**************************************************************
-   * 1) Configuration: Paste your two CSV URLs here
+   * 1) Configuration: Paste your two CSV URLs (exactly) here
    **************************************************************/
-  const CSV_PLAYERS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';     // e.g. https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv
-  const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv'; // e.g. https://docs.google.com/spreadsheets/d/.../pub?gid=123456789&single=true&output=csv
+  const CSV_PLAYERS    = 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/pub?gid=0&single=true&output=csv';
+  const CSV_SURVIVORS  = 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/pub?gid=123456789&single=true&output=csv';
 
   /**************************************************************
    * 2) Simple CSV Parser (no quoted‐field support)
    **************************************************************/
   function parseCSV(text) {
+    // Split into lines, extract headers, then build objects for each row
     const lines = text.trim().split('\n');
     const headers = lines[0].split(',');
     const records = [];
 
     for (let i = 1; i < lines.length; i++) {
-      if (lines[i].trim() === '') continue;  // skip empty lines
+      if (!lines[i].trim()) continue; // skip empty lines
       const row = lines[i].split(',');
       const obj = {};
       headers.forEach((h, idx) => {
@@ -232,12 +233,13 @@
    **************************************************************/
   async function loadAndRender() {
     try {
-      // 3a) Fetch players CSV & survivors CSV in parallel
+      // 3a) Fetch both CSVs in parallel
       const [respPlayers, respSurvivors] = await Promise.all([
         fetch(CSV_PLAYERS),
         fetch(CSV_SURVIVORS)
       ]);
 
+      // 3b) Check for fetch errors
       if (!respPlayers.ok) {
         throw new Error(`Failed to fetch players data (status ${respPlayers.status})`);
       }
@@ -245,29 +247,27 @@
         throw new Error(`Failed to fetch survivors data (status ${respSurvivors.status})`);
       }
 
-      const textPlayers = await respPlayers.text();
+      // 3c) Read the text of both CSVs
+      const textPlayers   = await respPlayers.text();
       const textSurvivors = await respSurvivors.text();
 
-      const playersData = parseCSV(textPlayers);
+      // 3d) Parse into arrays of objects
+      const playersData   = parseCSV(textPlayers);
       const survivorsData = parseCSV(textSurvivors);
 
-      // 3b) Hide spinner
+      // 3e) Hide the loading spinner
       document.getElementById('loading').style.display = 'none';
 
-      // 3c) Render “Players” section
+      /************************************************
+       * 4) Render “Players” (no more Status line here)
+       ************************************************/
       const pGrid = document.getElementById('playersGrid');
       pGrid.style.display = 'flex';
 
       playersData.forEach(row => {
-        const {
-          Player,
-          Survivor,
-          ImageURL,
-          Rank,
-          PerksAllowed
-        } = row; // Note: “Status” has been removed from here
+        // We only pull these 5 fields; note: Status is NOT destructured
+        const { Player, Survivor, ImageURL, Rank, PerksAllowed } = row;
 
-        // Create one player‐card
         const card = document.createElement('div');
         card.className = 'player-card';
 
@@ -277,14 +277,14 @@
         img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
         card.appendChild(img);
 
-        // Card content
+        // Card content wrapper
         const content = document.createElement('div');
         content.className = 'player-card-content';
 
         // Player name
         const nameEl = document.createElement('div');
         nameEl.className = 'player-name';
-        nameEl.textContent = Player || 'Unknown Player';
+        nameEl.textContent = Player || '';
         content.appendChild(nameEl);
 
         // Survivor
@@ -305,20 +305,21 @@
         perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
         content.appendChild(perksEl);
 
-        // (Status block removed entirely for players here)
+        // NOTE: We deliberately do NOT append a “Status” field here.
 
         card.appendChild(content);
         pGrid.appendChild(card);
       });
 
-      // 3d) Render “All Survivors” section
+      /************************************************
+       * 5) Render “All Survivors” (status-based color)
+       ************************************************/
       const sGrid = document.getElementById('survivorsGrid');
       sGrid.style.display = 'grid';
 
       survivorsData.forEach(row => {
         const { Survivor, Status, ImageURL } = row;
 
-        // One survivor‐card (smaller)
         const card = document.createElement('div');
         card.className = 'survivor-card';
 
@@ -328,10 +329,10 @@
         img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
         card.appendChild(img);
 
-        // Survivor’s name underneath
+        // Name with alive/dead coloring
         const nameEl = document.createElement('div');
         nameEl.className = 'survivor-name';
-        nameEl.textContent = Survivor || '-';
+        nameEl.textContent = Survivor || '';
         if (Status && Status.toLowerCase() === 'dead') {
           nameEl.style.color = '#c0392b'; // red for dead
         } else {
@@ -343,7 +344,7 @@
       });
 
     } catch (err) {
-      // Show error message if something goes wrong
+      // 6) If anything fails, hide spinner & show error
       document.getElementById('loading').style.display = 'none';
       const errorEl = document.getElementById('error');
       errorEl.style.display = 'block';
@@ -351,6 +352,7 @@
     }
   }
 
-  // Run when page loads
+  // Run when the DOM is fully loaded
   document.addEventListener('DOMContentLoaded', loadAndRender);
 </script>
+
