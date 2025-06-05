@@ -59,12 +59,18 @@
 
     /* ───────────────────────────────────────────────────────────────────────── */
     /* 3) “Players” Card Grid */
-    .players-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
+    .survivors-grid {
+  display: grid;
+  /* auto-fit makes empty columns collapse, so the last row will not be left-aligned */
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+
+  /* center each item in its cell */
+  justify-items: center;
+  /* center the entire grid’s content (including the final partial row) */
+  justify-content: center;
+}
     .player-card {
       background-color: #fff;
       border-radius: 8px;
