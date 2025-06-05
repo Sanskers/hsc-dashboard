@@ -291,22 +291,7 @@
           perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
           content.appendChild(perksEl);
 
-          // Status (green or red)
-          const statusEl = document.createElement('div');
-          statusEl.className = 'field';
-          const statusSpan = document.createElement('span');
-          statusSpan.textContent = Status || '-';
-          statusSpan.className = (Status && Status.toLowerCase() === 'alive')
-            ? 'status-alive'
-            : 'status-dead';
-          statusEl.innerHTML = `<span>Status:</span> `;
-          statusEl.appendChild(statusSpan);
-          content.appendChild(statusEl);
-
-          card.appendChild(content);
-          pGrid.appendChild(card);
-        });
-
+    
         // 3d) Render “All Survivors” section
         const sGrid = document.getElementById('survivorsGrid');
         sGrid.style.display = 'grid';
