@@ -111,7 +111,7 @@
     }
     .pip-overlay {
       position: absolute;
-      top: 50%;
+      top: 5%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: flex;
@@ -286,7 +286,7 @@
           pipOverlay.className = 'pip-overlay';
 
           const pipCount = parseInt(Pips) || 0;
-          const PIP_URL  = 'https://i.imgur.com/abcdefghijkl.png'; // ← Replace with your transparent pip‐icon URL
+          const PIP_URL  = 'blob:https://imgur.com/a30994c7-3e91-4210-8b6a-9ad1d2317568'; // ← Replace with your transparent pip‐icon URL
 
           for (let i = 0; i < pipCount; i++) {
             const pipImg = document.createElement('img');
