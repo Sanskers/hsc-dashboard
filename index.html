@@ -118,14 +118,15 @@
       left: 28.5%;
       transform: translate(-50%, -50%);
       display: flex;
-      gap: 0.1px;
-      pointer-events: none;
     }
     .pip-overlay img {
       width: 50px;  /* three times the original 20px */
       height: 50px;
-      /* ensure the pip PNG has a transparent background */
-    }
+      margin-left: -15px; /* overlap by 15px each */
+}
+   .pip-overlay img:first-child {
+  margin-left: 0;
+}
 
     /* 5B) Card Content (Name, Survivor, Rank, Perks) */
     .player-card-content {
