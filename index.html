@@ -75,6 +75,8 @@
       display: flex;
       flex-direction: column;
       transition: transform 0.15s ease-in-out;
+    /* Add this line so we can absolutely position the pips */
+      position: relative;
     }
     .player-card:hover {
       transform: translateY(-4px);
@@ -91,6 +93,19 @@
       display: flex;
       flex-direction: column;
     }
+    /* ───────── Pip Overlay ───────── */
+.pip-overlay {
+  position: absolute;
+  bottom: 8px;      /* 8px up from the bottom of the portrait */
+  right: 8px;       /* 8px in from the right edge */
+  display: flex;    /* lay out multiple pip icons in a row */
+  gap: 2px;         /* small gap between each pip icon */
+  pointer-events: none;  /* clicks pass through to the card (optional) */
+}
+.pip-overlay img {
+  width: 20px;      /* pick a size that looks good—maybe 16px or 20px */
+  height: 20px;
+}
     .player-name {
       font-size: 1.2rem;
       font-weight: bold;
@@ -271,51 +286,72 @@
       pGrid.style.display = 'flex';
 
       playersData.forEach(row => {
-        // We only pull these 5 fields; note: Status is NOT destructured
-        const { Player, Survivor, ImageURL, Rank, PerksAllowed } = row;
+  // 1) Include Pips in the destructuring
+  const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed } = row;
 
-        const card = document.createElement('div');
-        card.className = 'player-card';
+  // 2) Create the card wrapper exactly as before
+  const card = document.createElement('div');
+  card.className = 'player-card';
 
-        // Portrait image
-        const img = document.createElement('img');
-        img.src = ImageURL || '';
-        img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
-        card.appendChild(img);
+  // 3) Create the portrait <img>
+  const img = document.createElement('img');
+  img.src = ImageURL || '';
+  img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+  card.appendChild(img);
 
-        // Card content wrapper
-        const content = document.createElement('div');
-        content.className = 'player-card-content';
+  // 4) Create the pip‐overlay container (always on top of the portrait)
+  const pipOverlay = document.createElement('div');
+  pipOverlay.className = 'pip-overlay';
 
-        // Player name
-        const nameEl = document.createElement('div');
-        nameEl.className = 'player-name';
-        nameEl.textContent = Player || '';
-        content.appendChild(nameEl);
+  // 5) For each pip (if Pips is a number), insert one <img> icon
+  const pipCount = parseInt(Pips) || 0;
+  const PIP_URL = 'https://i.imgur.com/KgiVO6X.png'; // ← Replace with your real pip icon URL
 
-        // Survivor
-        const survEl = document.createElement('div');
-        survEl.className = 'field';
-        survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
-        content.appendChild(survEl);
+  for (let i = 0; i < pipCount; i++) {
+    const pipImg = document.createElement('img');
+    pipImg.src = PIP_URL;
+    pipImg.alt = 'pip';
+    pipOverlay.appendChild(pipImg);
+  }
 
-        // Rank
-        const rankEl = document.createElement('div');
-        rankEl.className = 'field';
-        rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
-        content.appendChild(rankEl);
+  // 6) Append the pipOverlay to the card. Because .player-card is position: relative,
+  //    and .pip-overlay is position: absolute, these pip icons will float over the portrait.
+  card.appendChild(pipOverlay);
 
-        // PerksAllowed
-        const perksEl = document.createElement('div');
-        perksEl.className = 'field';
-        perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-        content.appendChild(perksEl);
+  // 7) Now append the existing “card‐content” (player name, survivor, rank, perks)
+  const content = document.createElement('div');
+  content.className = 'player-card-content';
 
-        // NOTE: We deliberately do NOT append a “Status” field here.
+  // Player name
+  const nameEl = document.createElement('div');
+  nameEl.className = 'player-name';
+  nameEl.textContent = Player || 'Unknown Player';
+  content.appendChild(nameEl);
 
-        card.appendChild(content);
-        pGrid.appendChild(card);
-      });
+  // Survivor
+  const survEl = document.createElement('div');
+  survEl.className = 'field';
+  survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
+  content.appendChild(survEl);
+
+  // Rank
+  const rankEl = document.createElement('div');
+  rankEl.className = 'field';
+  rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
+  content.appendChild(rankEl);
+
+  // PerksAllowed
+  const perksEl = document.createElement('div');
+  perksEl.className = 'field';
+  perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+  content.appendChild(perksEl);
+
+  // (We do not add “Status” here, since that was removed.)
+
+  card.appendChild(content);
+  pGrid.appendChild(card);
+});
+
 
       /************************************************
        * 5) Render “All Survivors” (status-based color)
