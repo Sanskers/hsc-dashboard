@@ -66,68 +66,61 @@
   margin-top: 10px;
   justify-items: center;
 }
-    .player-card {
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      width: 220px;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.15s ease-in-out;
-    /* Add this line so we can absolutely position the pips */
-      position: relative;
-    }
-    .player-card:hover {
-      transform: translateY(-4px);
-    }
-    .player-card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      background-color: #ddd;
-    }
-    .player-card-content {
-      padding: 12px 16px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    /* ───────── Pip Overlay ───────── */
+    /* ─── Modify the player-card so portrait is in its own “img-container” ─── */
+/* (This block may already exist; we’re only adding/adjusting .img-container) */
+
+.player-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease-in-out;
+  /* position relative so children can be absolutely positioned */
+  position: relative;
+}
+
+.player-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Wrap the portrait in this container so we can absolutely position pips over it */
+.img-container {
+  /* exactly the same dimensions as the portrait image area */
+  position: relative;             /* establish a positioning context */
+  width: 100%;                    /* full card width */
+  height: 200px;                  /* match the portrait height */
+  overflow: hidden;               /* hide anything outside the portrait box */
+  background-color: #ddd;         /* same fallback as the old img rule */
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── Center the pip overlay over the portrait ─── */
 .pip-overlay {
   position: absolute;
-  bottom: 8px;      /* 8px up from the bottom of the portrait */
-  right: 8px;       /* 8px in from the right edge */
-  display: flex;    /* lay out multiple pip icons in a row */
-  gap: 2px;         /* small gap between each pip icon */
-  pointer-events: none;  /* clicks pass through to the card (optional) */
+  top: 50%;                       /* halfway down the img-container */
+  left: 50%;                      /* halfway across the img-container */
+  transform: translate(-50%, -50%); /* center exactly */
+  display: flex;                  
+  gap: 4px;                       /* slight space between icons */
+  pointer-events: none;           /* clicks “pass through” if needed */
+  /* no background: the pip PNG itself should be transparent */
 }
+
 .pip-overlay img {
-  width: 20px;      /* pick a size that looks good—maybe 16px or 20px */
-  height: 20px;
+  width: 60px;                    /* triple the old 20px size */
+  height: 60px;
+  /* no background or border: the PNG should be transparent */
 }
-    .player-name {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 6px;
-      text-align: center;
-      color: #2c3e50;
-    }
-    .field {
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-    .field span {
-      font-weight: 600;
-    }
-    .status-alive {
-      color: #27ae60;
-      font-weight: bold;
-    }
-    .status-dead {
-      color: #c0392b;
-      font-weight: bold;
-    }
+
 
     /* ───────────────────────────────────────────────────────────────────────── */
     /* 4) “All Survivors” Grid (smaller cards, wrap nicely) */
@@ -286,26 +279,26 @@
       pGrid.style.display = 'flex';
 
       playersData.forEach(row => {
-  // 1) Include Pips in the destructuring
   const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed } = row;
 
-  // 2) Create the card wrapper exactly as before
+  // Create the card <div>
   const card = document.createElement('div');
   card.className = 'player-card';
 
-  // 3) Create the portrait <img>
+  // ───── Portrait & Pip Overlay (wrapped together) ─────
+  const imgContainer = document.createElement('div');
+  imgContainer.className = 'img-container';
+
   const img = document.createElement('img');
   img.src = ImageURL || '';
   img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
-  card.appendChild(img);
+  imgContainer.appendChild(img);
 
-  // 4) Create the pip‐overlay container (always on top of the portrait)
   const pipOverlay = document.createElement('div');
   pipOverlay.className = 'pip-overlay';
 
-  // 5) For each pip (if Pips is a number), insert one <img> icon
   const pipCount = parseInt(Pips) || 0;
-  const PIP_URL = 'https://i.imgur.com/KgiVO6X.png'; // ← Replace with your real pip icon URL
+  const PIP_URL = 'https://i.imgur.com/abcdefghijkl.png'; // ← your transparent pip icon
 
   for (let i = 0; i < pipCount; i++) {
     const pipImg = document.createElement('img');
@@ -313,6 +306,39 @@
     pipImg.alt = 'pip';
     pipOverlay.appendChild(pipImg);
   }
+
+  imgContainer.appendChild(pipOverlay);
+  card.appendChild(imgContainer);
+  // ─────────────────────────────────────────────────────
+
+  // ───── The rest of the card (name, survivor, rank, perks) ─────
+  const content = document.createElement('div');
+  content.className = 'player-card-content';
+
+  const nameEl = document.createElement('div');
+  nameEl.className = 'player-name';
+  nameEl.textContent = Player || 'Unknown Player';
+  content.appendChild(nameEl);
+
+  const survEl = document.createElement('div');
+  survEl.className = 'field';
+  survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
+  content.appendChild(survEl);
+
+  const rankEl = document.createElement('div');
+  rankEl.className = 'field';
+  rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
+  content.appendChild(rankEl);
+
+  const perksEl = document.createElement('div');
+  perksEl.className = 'field';
+  perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+  content.appendChild(perksEl);
+
+  card.appendChild(content);
+  pGrid.appendChild(card);
+});
+
 
   // 6) Append the pipOverlay to the card. Because .player-card is position: relative,
   //    and .pip-overlay is position: absolute, these pip icons will float over the portrait.
