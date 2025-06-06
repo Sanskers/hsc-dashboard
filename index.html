@@ -280,46 +280,47 @@
         const pGrid = document.getElementById('playersGrid');
         pGrid.style.display = 'flex';
 
-        playersData.forEach(row => {
-          // Destructure including the new "Pips" field
-          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed } = row;
+                /************************************************
+         * 4) Render “Players” (with Pips overlay+text)
+         ************************************************/
+        const pGrid = document.getElementById('playersGrid');
+        pGrid.style.display = 'flex';
 
-          // Create the card container
+        playersData.forEach(row => {
+          // 1) Pull in Pips along with the other fields
+          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed } = row;
+          const pipCount = parseInt(Pips) || 0;
+
+          // 2) Create the card wrapper
           const card = document.createElement('div');
           card.className = 'player-card';
 
-          // 1) Portrait + Pip Overlay Container
+          // 3) Portrait + pip-overlay container
           const imgContainer = document.createElement('div');
           imgContainer.className = 'img-container';
 
-          // Portrait image
           const img = document.createElement('img');
           img.src = ImageURL || '';
           img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
           imgContainer.appendChild(img);
 
-          // Pip overlay (centered)
           const pipOverlay = document.createElement('div');
           pipOverlay.className = 'pip-overlay';
-
-          const pipCount = parseInt(Pips) || 0;
-          const PIP_URL  = 'https://i.imgur.com/KgiVO6X.png'; // ← Replace with your transparent pip‐icon URL
-
+          const PIP_URL = 'https://i.imgur.com/abcdefghijkl.png'; // ← your transparent pip icon
           for (let i = 0; i < pipCount; i++) {
             const pipImg = document.createElement('img');
             pipImg.src = PIP_URL;
             pipImg.alt = 'pip';
             pipOverlay.appendChild(pipImg);
           }
-
           imgContainer.appendChild(pipOverlay);
           card.appendChild(imgContainer);
 
-          // 2) Card Content (Name, Survivor, Rank, Perks)
+          // 4) Card content (name, survivor, rank, perks, pips text)
           const content = document.createElement('div');
           content.className = 'player-card-content';
 
-          // Player name
+          // Name
           const nameEl = document.createElement('div');
           nameEl.className = 'player-name';
           nameEl.textContent = Player || 'Unknown Player';
@@ -337,23 +338,22 @@
           rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
           content.appendChild(rankEl);
 
-          // PerksAllowed (existing)
-  const perksEl = document.createElement('div');
-  perksEl.className = 'field';
-  perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-  content.appendChild(perksEl);
+          // Perks
+          const perksEl = document.createElement('div');
+          perksEl.className = 'field';
+          perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+          content.appendChild(perksEl);
 
-  // NEW: Textual Pip count
-  const pipCount = parseInt(Pips) || 0;
-  const pipsText  = document.createElement('div');
-  pipsText.className = 'field';
-  pipsText.innerHTML = `<span>Pips:</span> ${pipCount}`;
-  content.appendChild(pipsText);
+          // ─── NEW: Textual Pips count ───
+          const pipsText = document.createElement('div');
+          pipsText.className = 'field';
+          pipsText.innerHTML = `<span>Pips:</span> ${pipCount}`;
+          content.appendChild(pipsText);
 
-  // Finish
-  card.appendChild(content);
-  pGrid.appendChild(card);
+          card.appendChild(content);
+          pGrid.appendChild(card);
         });
+
 
         /************************************************
          * 5) Render “All Survivors” (with status color)
