@@ -4,29 +4,40 @@
   <meta charset="UTF-8" />
   <title>Hardcore Survivor Challenge Rules</title>
   <style>
-    /* copy your existing CSS here (or better yet, move shared rules into styles.css) */
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 1) Full-page background (same as dashboard) */
     body, html {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  /* Replace the URL below with your own background‐image link: */
-  background-image: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  background-attachment: fixed;  /* optional—background stays fixed on scroll */
-  /* Fallback color if the image fails: */
-  background-color: #f5f5f5;
-  color: #333;
-}
-    h1 {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url("https://i.imgur.com/YourBackground.jpg");
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 2) Container with semi-transparent background & centered text */
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+
+      /* center all text inside */
       text-align: center;
-      font-size: 2rem;
-      margin-bottom: 1rem;
+
+      /* ensure even long words wrap to the next line */
+      word-wrap: break-word;
+      hyphens: auto;
     }
-    ol {
-      margin-left: 1.2rem;
-    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 3) “Back” button */
     .btn {
       display: inline-block;
       padding: 0.5rem 1rem;
@@ -38,6 +49,24 @@
     }
     .btn:hover {
       background-color: #2980b9;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 4) Headings and rules list */
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    ol {
+      list-style-position: inside;
+      margin: 0 auto;
+      padding: 0;
+      /* restrict width of the list itself if you prefer */
+      max-width: 700px;
+    }
+    li {
+      margin: 0.8em 0;
+      line-height: 1.4;
     }
   </style>
 </head>
