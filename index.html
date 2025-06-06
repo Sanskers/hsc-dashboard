@@ -337,22 +337,22 @@
           rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
           content.appendChild(rankEl);
 
-          // PerksAllowed
-          const perksEl = document.createElement('div');
-          perksEl.className = 'field';
-          perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-          content.appendChild(perksEl);
+          // PerksAllowed (existing)
+  const perksEl = document.createElement('div');
+  perksEl.className = 'field';
+  perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+  content.appendChild(perksEl);
 
-          // ─── Add this to show the Pip count in text ───
-           const pipCount = parseInt(Pips) || 0;           // you already have this above
-           const pipsText  = document.createElement('div');
-           pipsText.className = 'field';
-           pipsText.innerHTML = `<span>Pips:</span> ${pipCount}`;
-           content.appendChild(pipsText);
-           // ───────────────────────────────────────────────
-         
-          card.appendChild(content);
-          pGrid.appendChild(card);
+  // NEW: Textual Pip count
+  const pipCount = parseInt(Pips) || 0;
+  const pipsText  = document.createElement('div');
+  pipsText.className = 'field';
+  pipsText.innerHTML = `<span>Pips:</span> ${pipCount}`;
+  content.appendChild(pipsText);
+
+  // Finish
+  card.appendChild(content);
+  pGrid.appendChild(card);
         });
 
         /************************************************
