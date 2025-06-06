@@ -2,25 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HSC Progress Dashboard</title>
-
+  <title>Hardcore Survivor Challenge Progress</title>
   <style>
- /* ───────────────────────────────────────────────────────────────────────── */
-  /* Add this “body” rule at the very top of your style block: */
-  body {
-    background-image: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg");
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    background-attachment: fixed;
-    background-color: #f5f5f5; /* fallback if image fails */
-    margin: 0;    /* (you already have this) */
-    padding: 0;   /* (you already have this) */
-    font-family: Arial, sans-serif;  /* (you already have this) */
-    color: #333;  /* (you already have this) */
-  }
-
     /* ───────────────────────────────────────────────────────────────────────── */
     /* 1) Basic Reset & Body Styles */
     body, html {
@@ -35,107 +18,144 @@
       max-width: 100%;
       height: auto;
     }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 2) Container & Headings */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+      /* Example: If you have a background image, you can make the container semi-transparent:
+         background-color: rgba(255, 255, 255, 0.85); */
+      background-color: #fff;
+    }
     h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 2rem;
-  color: #FAF9F6; /* or whatever color you prefer */
-}
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: #333;
+    }
     h2 {
       margin-top: 40px;
       margin-bottom: 10px;
       font-size: 1.8rem;
       text-align: center;
-      color: #FAF9F6;
+      color: #333;
     }
 
     /* ───────────────────────────────────────────────────────────────────────── */
-    /* 2) Container & Layout */
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 20px;
+    /* 3) Loading Spinner */
+    #loading {
+      text-align: center;
+      margin-top: 60px;
+    }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* ───────────────────────────────────────────────────────────────────────── */
-    /* 3) “Players” Card Grid */
-  .survivors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
-  margin-top: 10px;
-  justify-items: center;
-}
-    /* ─── Modify the player-card so portrait is in its own “img-container” ─── */
-/* (This block may already exist; we’re only adding/adjusting .img-container) */
-
-.player-card {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  width: 220px;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.15s ease-in-out;
-  /* position relative so children can be absolutely positioned */
-  position: relative;
-}
-
-.player-card:hover {
-  transform: translateY(-4px);
-}
-
-/* Wrap the portrait in this container so we can absolutely position pips over it */
-.img-container {
-  /* exactly the same dimensions as the portrait image area */
-  position: relative;             /* establish a positioning context */
-  width: 100%;                    /* full card width */
-  height: 200px;                  /* match the portrait height */
-  overflow: hidden;               /* hide anything outside the portrait box */
-  background-color: #ddd;         /* same fallback as the old img rule */
-}
-
-.img-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ─── Center the pip overlay over the portrait ─── */
-.pip-overlay {
-  position: absolute;
-  top: 50%;                       /* halfway down the img-container */
-  left: 50%;                      /* halfway across the img-container */
-  transform: translate(-50%, -50%); /* center exactly */
-  display: flex;                  
-  gap: 4px;                       /* slight space between icons */
-  pointer-events: none;           /* clicks “pass through” if needed */
-  /* no background: the pip PNG itself should be transparent */
-}
-
-.pip-overlay img {
-  width: 60px;                    /* triple the old 20px size */
-  height: 60px;
-  /* no background or border: the PNG should be transparent */
-}
-
+    /* 4) Error Message */
+    #error {
+      text-align: center;
+      color: #e74c3c;
+      margin-top: 40px;
+      font-size: 1.1rem;
+      display: none;
+    }
 
     /* ───────────────────────────────────────────────────────────────────────── */
-    /* 4) “All Survivors” Grid (smaller cards, wrap nicely) */
-   .survivors-grid {
-  display: grid;
-  /* auto-fit makes empty columns collapse, so the last row will not be left-aligned */
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 12px;
-  margin-top: 10px;
+    /* 5) Players Grid & Cards */
+    .players-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .player-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease-in-out;
+      position: relative; /* allow absolute positioning of overlay */
+    }
+    .player-card:hover {
+      transform: translateY(-4px);
+    }
 
-  /* center each item in its cell */
-  justify-items: center;
-  /* center the entire grid’s content (including the final partial row) */
-  justify-content: center;
-}
+    /* 5A) Portrait Container & Pip Overlay */
+    .img-container {
+      position: relative;
+      width: 100%;
+      height: 200px;         /* match the height of the portrait */
+      overflow: hidden;
+      background-color: #ddd; /* fallback color if image fails */
+    }
+    .img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .pip-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 4px;
+      pointer-events: none;
+    }
+    .pip-overlay img {
+      width: 60px;  /* three times the original 20px */
+      height: 60px;
+      /* ensure the pip PNG has a transparent background */
+    }
+
+    /* 5B) Card Content (Name, Survivor, Rank, Perks) */
+    .player-card-content {
+      padding: 12px 16px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .player-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      text-align: center;
+      color: #2c3e50;
+    }
+    .field {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .field span {
+      font-weight: 600;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /* 6) All Survivors Grid & Cards */
+    .survivors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+      justify-items: center;
+      justify-content: center;
+    }
     .survivor-card {
       background-color: #fff;
       border-radius: 6px;
@@ -161,266 +181,199 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
-    /* ───────────────────────────────────────────────────────────────────────── */
-    /* 5) Loading Spinner */
-    #loading {
-      text-align: center;
-      margin-top: 60px;
-    }
-    .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #3498db;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ───────────────────────────────────────────────────────────────────────── */
-    /* 6) Error Message */
-    #error {
-      text-align: center;
-      color: #e74c3c;
-      margin-top: 40px;
-      font-size: 1.1rem;
-    }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h1>Hardcore Survivor Challenge Progress</h1>
 
-    <!-- Loading Spinner -->
     <div id="loading">
       <div class="spinner"></div>
       <div>Loading data…</div>
     </div>
 
-    <!-- Error Message (hidden initially) -->
-    <div id="error" style="display: none;"></div>
+    <div id="error"></div>
 
-    <!-- Section A: Four Players -->
     <h2>Players’ Current Survivors</h2>
     <div id="playersGrid" class="players-grid" style="display: none;"></div>
 
-    <!-- Section B: All Survivors Grid -->
-    <h2>Survivor Status</h2>
+    <h2>All Base Survivors</h2>
     <div id="survivorsGrid" class="survivors-grid" style="display: none;"></div>
   </div>
 
- <script>
-  /**************************************************************
-   * 1) Configuration: Paste your two CSV URLs (exactly) here
-   **************************************************************/
-  const CSV_PLAYERS    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
-  const CSV_SURVIVORS  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
+  <script>
+    /**************************************************************
+     * 1) Configuration: Paste your two CSV URLs (exactly) here
+     **************************************************************/
+    const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
+    const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
 
-  /**************************************************************
-   * 2) Simple CSV Parser (no quoted‐field support)
-   **************************************************************/
-  function parseCSV(text) {
-    // Split into lines, extract headers, then build objects for each row
-    const lines = text.trim().split('\n');
-    const headers = lines[0].split(',');
-    const records = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue; // skip empty lines
-      const row = lines[i].split(',');
-      const obj = {};
-      headers.forEach((h, idx) => {
-        obj[h.trim()] = row[idx] ? row[idx].trim() : '';
-      });
-      records.push(obj);
+    /**************************************************************
+     * 2) Simple CSV Parser (no quoted‐field support)
+     **************************************************************/
+    function parseCSV(text) {
+      const lines   = text.trim().split('\n');
+      const headers = lines[0].split(',');
+      const records = [];
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue; // skip empty lines
+        const rowParts = lines[i].split(',');
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h.trim()] = rowParts[idx] ? rowParts[idx].trim() : '';
+        });
+        records.push(obj);
+      }
+      return records;
     }
-    return records;
-  }
 
-  /**************************************************************
-   * 3) Main: Fetch Both CSVs → Parse → Render
-   **************************************************************/
-  async function loadAndRender() {
-    try {
-      // 3a) Fetch both CSVs in parallel
-      const [respPlayers, respSurvivors] = await Promise.all([
-        fetch(CSV_PLAYERS),
-        fetch(CSV_SURVIVORS)
-      ]);
+    /**************************************************************
+     * 3) Main: Fetch Both CSVs → Parse → Render
+     **************************************************************/
+    async function loadAndRender() {
+      try {
+        // 3a) Fetch both CSVs in parallel
+        const [respPlayers, respSurvivors] = await Promise.all([
+          fetch(CSV_PLAYERS),
+          fetch(CSV_SURVIVORS)
+        ]);
 
-      // 3b) Check for fetch errors
-      if (!respPlayers.ok) {
-        throw new Error(`Failed to fetch players data (status ${respPlayers.status})`);
-      }
-      if (!respSurvivors.ok) {
-        throw new Error(`Failed to fetch survivors data (status ${respSurvivors.status})`);
-      }
-
-      // 3c) Read the text of both CSVs
-      const textPlayers   = await respPlayers.text();
-      const textSurvivors = await respSurvivors.text();
-
-      // 3d) Parse into arrays of objects
-      const playersData   = parseCSV(textPlayers);
-      const survivorsData = parseCSV(textSurvivors);
-
-      // 3e) Hide the loading spinner
-      document.getElementById('loading').style.display = 'none';
-
-      /************************************************
-       * 4) Render “Players” (no more Status line here)
-       ************************************************/
-      const pGrid = document.getElementById('playersGrid');
-      pGrid.style.display = 'flex';
-
-      playersData.forEach(row => {
-  const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed } = row;
-
-  // Create the card <div>
-  const card = document.createElement('div');
-  card.className = 'player-card';
-
-  // ───── Portrait & Pip Overlay (wrapped together) ─────
-  const imgContainer = document.createElement('div');
-  imgContainer.className = 'img-container';
-
-  const img = document.createElement('img');
-  img.src = ImageURL || '';
-  img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
-  imgContainer.appendChild(img);
-
-  const pipOverlay = document.createElement('div');
-  pipOverlay.className = 'pip-overlay';
-
-  const pipCount = parseInt(Pips) || 0;
-  const PIP_URL = 'https://i.imgur.com/abcdefghijkl.png'; // ← your transparent pip icon
-
-  for (let i = 0; i < pipCount; i++) {
-    const pipImg = document.createElement('img');
-    pipImg.src = PIP_URL;
-    pipImg.alt = 'pip';
-    pipOverlay.appendChild(pipImg);
-  }
-
-  imgContainer.appendChild(pipOverlay);
-  card.appendChild(imgContainer);
-  // ─────────────────────────────────────────────────────
-
-  // ───── The rest of the card (name, survivor, rank, perks) ─────
-  const content = document.createElement('div');
-  content.className = 'player-card-content';
-
-  const nameEl = document.createElement('div');
-  nameEl.className = 'player-name';
-  nameEl.textContent = Player || 'Unknown Player';
-  content.appendChild(nameEl);
-
-  const survEl = document.createElement('div');
-  survEl.className = 'field';
-  survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
-  content.appendChild(survEl);
-
-  const rankEl = document.createElement('div');
-  rankEl.className = 'field';
-  rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
-  content.appendChild(rankEl);
-
-  const perksEl = document.createElement('div');
-  perksEl.className = 'field';
-  perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-  content.appendChild(perksEl);
-
-  card.appendChild(content);
-  pGrid.appendChild(card);
-});
-
-
-  // 6) Append the pipOverlay to the card. Because .player-card is position: relative,
-  //    and .pip-overlay is position: absolute, these pip icons will float over the portrait.
-  card.appendChild(pipOverlay);
-
-  // 7) Now append the existing “card‐content” (player name, survivor, rank, perks)
-  const content = document.createElement('div');
-  content.className = 'player-card-content';
-
-  // Player name
-  const nameEl = document.createElement('div');
-  nameEl.className = 'player-name';
-  nameEl.textContent = Player || 'Unknown Player';
-  content.appendChild(nameEl);
-
-  // Survivor
-  const survEl = document.createElement('div');
-  survEl.className = 'field';
-  survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
-  content.appendChild(survEl);
-
-  // Rank
-  const rankEl = document.createElement('div');
-  rankEl.className = 'field';
-  rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
-  content.appendChild(rankEl);
-
-  // PerksAllowed
-  const perksEl = document.createElement('div');
-  perksEl.className = 'field';
-  perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-  content.appendChild(perksEl);
-
-  // (We do not add “Status” here, since that was removed.)
-
-  card.appendChild(content);
-  pGrid.appendChild(card);
-});
-
-
-      /************************************************
-       * 5) Render “All Survivors” (status-based color)
-       ************************************************/
-      const sGrid = document.getElementById('survivorsGrid');
-      sGrid.style.display = 'grid';
-
-      survivorsData.forEach(row => {
-        const { Survivor, Status, ImageURL } = row;
-
-        const card = document.createElement('div');
-        card.className = 'survivor-card';
-
-        // Portrait
-        const img = document.createElement('img');
-        img.src = ImageURL || '';
-        img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
-        card.appendChild(img);
-
-        // Name with alive/dead coloring
-        const nameEl = document.createElement('div');
-        nameEl.className = 'survivor-name';
-        nameEl.textContent = Survivor || '';
-        if (Status && Status.toLowerCase() === 'dead') {
-          nameEl.style.color = '#c0392b'; // red for dead
-        } else {
-          nameEl.style.color = '#27ae60'; // green for alive
+        // 3b) Check for fetch errors
+        if (!respPlayers.ok) {
+          throw new Error(`Failed to fetch players data (status ${respPlayers.status})`);
         }
-        card.appendChild(nameEl);
+        if (!respSurvivors.ok) {
+          throw new Error(`Failed to fetch survivors data (status ${respSurvivors.status})`);
+        }
 
-        sGrid.appendChild(card);
-      });
+        // 3c) Read the CSV text
+        const textPlayers   = await respPlayers.text();
+        const textSurvivors = await respSurvivors.text();
 
-    } catch (err) {
-      // 6) If anything fails, hide spinner & show error
-      document.getElementById('loading').style.display = 'none';
-      const errorEl = document.getElementById('error');
-      errorEl.style.display = 'block';
-      errorEl.textContent = 'Error loading data: ' + err.message;
+        // 3d) Parse into arrays of objects
+        const playersData   = parseCSV(textPlayers);
+        const survivorsData = parseCSV(textSurvivors);
+
+        // 3e) Hide the loading spinner
+        document.getElementById('loading').style.display = 'none';
+
+        /************************************************
+         * 4) Render “Players” (with Pips overlay)
+         ************************************************/
+        const pGrid = document.getElementById('playersGrid');
+        pGrid.style.display = 'flex';
+
+        playersData.forEach(row => {
+          // Destructure including the new "Pips" field
+          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed } = row;
+
+          // Create the card container
+          const card = document.createElement('div');
+          card.className = 'player-card';
+
+          // 1) Portrait + Pip Overlay Container
+          const imgContainer = document.createElement('div');
+          imgContainer.className = 'img-container';
+
+          // Portrait image
+          const img = document.createElement('img');
+          img.src = ImageURL || '';
+          img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+          imgContainer.appendChild(img);
+
+          // Pip overlay (centered)
+          const pipOverlay = document.createElement('div');
+          pipOverlay.className = 'pip-overlay';
+
+          const pipCount = parseInt(Pips) || 0;
+          const PIP_URL  = 'https://i.imgur.com/abcdefghijkl.png'; // ← Replace with your transparent pip‐icon URL
+
+          for (let i = 0; i < pipCount; i++) {
+            const pipImg = document.createElement('img');
+            pipImg.src = PIP_URL;
+            pipImg.alt = 'pip';
+            pipOverlay.appendChild(pipImg);
+          }
+
+          imgContainer.appendChild(pipOverlay);
+          card.appendChild(imgContainer);
+
+          // 2) Card Content (Name, Survivor, Rank, Perks)
+          const content = document.createElement('div');
+          content.className = 'player-card-content';
+
+          // Player name
+          const nameEl = document.createElement('div');
+          nameEl.className = 'player-name';
+          nameEl.textContent = Player || 'Unknown Player';
+          content.appendChild(nameEl);
+
+          // Survivor
+          const survEl = document.createElement('div');
+          survEl.className = 'field';
+          survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
+          content.appendChild(survEl);
+
+          // Rank
+          const rankEl = document.createElement('div');
+          rankEl.className = 'field';
+          rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
+          content.appendChild(rankEl);
+
+          // PerksAllowed
+          const perksEl = document.createElement('div');
+          perksEl.className = 'field';
+          perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+          content.appendChild(perksEl);
+
+          card.appendChild(content);
+          pGrid.appendChild(card);
+        });
+
+        /************************************************
+         * 5) Render “All Survivors” (with status color)
+         ************************************************/
+        const sGrid = document.getElementById('survivorsGrid');
+        sGrid.style.display = 'grid';
+
+        survivorsData.forEach(row => {
+          const { Survivor, Status, ImageURL } = row;
+
+          // Survivor card
+          const card = document.createElement('div');
+          card.className = 'survivor-card';
+
+          // Portrait
+          const img = document.createElement('img');
+          img.src = ImageURL || '';
+          img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+          card.appendChild(img);
+
+          // Name (green if alive, red if dead)
+          const nameEl = document.createElement('div');
+          nameEl.className = 'survivor-name';
+          nameEl.textContent = Survivor || '';
+          if (Status && Status.toLowerCase() === 'dead') {
+            nameEl.style.color = '#c0392b';
+          } else {
+            nameEl.style.color = '#27ae60';
+          }
+          card.appendChild(nameEl);
+
+          sGrid.appendChild(card);
+        });
+
+      } catch (err) {
+        // Show error message
+        document.getElementById('loading').style.display = 'none';
+        const errorEl = document.getElementById('error');
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Error loading data: ' + err.message;
+      }
     }
-  }
 
-  // Run when the DOM is fully loaded
-  document.addEventListener('DOMContentLoaded', loadAndRender);
-</script>
-
+    // Run when page loads
+    document.addEventListener('DOMContentLoaded', loadAndRender);
+  </script>
+</body>
+</html>
