@@ -87,7 +87,7 @@
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
+      overflow: visible;
       width: 220px;
       display: flex;
       flex-direction: column;
@@ -98,7 +98,7 @@
       transform: translateY(-4px);
     }
 
-    /* 5A) Portrait Container & Pip Overlay */
+    /* 5A) Portrait Container &  Overlay */
     .img-container {
       position: relative;
       width: 100%;
@@ -112,19 +112,19 @@
       object-fit: cover;
       display: block;
     }
-    .pip-overlay {
+    .-overlay {
       position: absolute;
       top: 90%;
       left: 28.5%;
       transform: translate(-50%, -50%);
       display: flex;
     }
-    .pip-overlay img {
+    .-overlay img {
       width: 50px;  /* three times the original 20px */
       height: 50px;
       margin-left: -15px; /* overlap by 15px each */
 }
-   .pip-overlay img:first-child {
+   .-overlay img:first-child {
   margin-left: 0;
 }
 
@@ -262,7 +262,7 @@
         document.getElementById('loading').style.display = 'none';
 
         /************************************************
-         * 4) Render “Players” (with Pips overlay)
+         * 4) Render “Players” (with s overlay)
          ************************************************/
         const pGrid = document.getElementById('playersGrid');
         pGrid.style.display = 'flex';
