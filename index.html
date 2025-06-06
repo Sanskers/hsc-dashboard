@@ -283,7 +283,7 @@
 
         playersData.forEach(row => {
           // 1) Pull in Pips along with the other fields
-          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed } = row;
+          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed, Twitch } = row;
           const pipCount = parseInt(Pips) || 0;
 
           // 2) Create the card wrapper
@@ -308,7 +308,21 @@
             pipImg.alt = 'pip';
             pipOverlay.appendChild(pipImg);
           }
-          imgContainer.appendChild(pipOverlay);
+       
+         // wrap imgContainer in a link if we have a Twitch URL
+if (Twitch) {
+  const link = document.createElement('a');
+  link.href = Twitch;
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.appendChild(imgContainer);
+  card.appendChild(link);
+} else {
+  // no Twitch URL? just append the container
+  card.appendChild(imgContainer);
+}
+         
+         imgContainer.appendChild(pipOverlay);
           card.appendChild(imgContainer);
 
           // 4) Card content (name, survivor, rank, perks, pips text)
