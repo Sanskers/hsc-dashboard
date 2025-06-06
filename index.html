@@ -96,6 +96,15 @@
 }
 
 .player-card {
+ width: 220px;              /* fix the card width */
+  display: flex;
+  flex-direction: column;
+  position: relative;        /* for the overlay */
+  overflow: visible;         /* allow pip overflow if you want */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform .15s ease-in-out; 
   position: relative;
   overflow: visible;   /* <— allow overflow here, too */
   /* ... your other .player-card rules ... */
