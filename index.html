@@ -1,68 +1,67 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Hardcore Survivor Challenge Progress</title>
   <style>
-    /* ───────────────────────────────────────────────────────────────────────── */
-  
-   .btn {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  background-color: #3498db;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-}
-
-.btn:hover {
-  background-color: #2980b9;
-}
-   /* 1) Basic Reset & Body Styles */
+    /* ───────────────────────────────────────────────────────── */
+    /* 1) Reset & Background */
     body, html {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  /* Replace the URL below with your own background‐image link: */
-  background-image: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  background-attachment: fixed;  /* optional—background stays fixed on scroll */
-  /* Fallback color if the image fails: */
-  background-color: #f5f5f5;
-  color: #333;
-}
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg");
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+      background-color: #f5f5f5;
+      color: #333;
+    }
 
-
-    /* ───────────────────────────────────────────────────────────────────────── */
-    /* 2) Container & Headings */
+    /* ───────────────────────────────────────────────────────── */
+    /* 2) Container & Buttons */
     .container {
       max-width: 960px;
-      margin: 0 auto;
+      margin: 40px auto;
       padding: 20px;
-      /* Example: If you have a background image, you can make the container semi-transparent:
-         background-color: rgba(255, 255, 255, 0.85); */
-      background-color: rgba(255, 255, 255, 0.50);
+      background-color: rgba(255,255,255,0.9);
+      border-radius: 8px;
+    }
+    .btn, #controls button {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #3498db;
+      color: #fff;
+      text-decoration: none;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 5px 15px;
+    }
+    .btn:hover, #controls button:hover {
+      background-color: #2980b9;
+    }
+    #controls button.active {
+      background-color: #2980b9;
     }
 
-    h1 {
+    /* ───────────────────────────────────────────────────────── */
+    /* 3) Stats & Filters */
+    #stats {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    #stats span { margin: 0 10px; }
+
+    #controls {
       text-align: center;
       margin-bottom: 20px;
-      font-size: 2rem;
-      color: #333;
-    }
-    h2 {
-      margin-top: 40px;
-      margin-bottom: 10px;
-      font-size: 1.8rem;
-      text-align: center;
-      color: #333;
     }
 
-    /* ───────────────────────────────────────────────────────────────────────── */
-    /* 3) Loading Spinner */
+    /* ───────────────────────────────────────────────────────── */
+    /* 4) Loading Spinner & Error */
     #loading {
       text-align: center;
       margin-top: 60px;
@@ -76,21 +75,16 @@
       animation: spin 1s linear infinite;
       margin: 0 auto 10px;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ───────────────────────────────────────────────────────────────────────── */
-    /* 4) Error Message */
+    @keyframes spin { to { transform: rotate(360deg); } }
     #error {
+      display: none;
       text-align: center;
       color: #e74c3c;
       margin-top: 40px;
       font-size: 1.1rem;
-      display: none;
     }
 
-    /* ───────────────────────────────────────────────────────────────────────── */
+    /* ───────────────────────────────────────────────────────── */
     /* 5) Players Grid & Cards */
     .players-grid {
       display: flex;
@@ -98,107 +92,81 @@
       gap: 20px;
       justify-content: center;
     }
-  
-
-    /* 5A) Portrait Container &  Overlay */
-   /* Allow pips to spill outside the portrait */
-.img-container {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: visible;   /* <— allow overflow here */
-  background-color: #ddd;
-}
-
- .img-container img {
-  width: 100%;       /* fill the container’s width */
-  height: 100%;      /* fill the container’s height */
-  object-fit: cover; /* crop/scale to cover exactly */
-  display: block;
-}
-
-.player-card {
- width: 220px;              /* fix the card width */
-  display: flex;
-  flex-direction: column;
-  position: relative;        /* for the overlay */
-  overflow: visible;         /* allow pip overflow if you want */
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform .15s ease-in-out; 
-  position: relative;
-  overflow: visible;   /* <— allow overflow here, too */
-  /* ... your other .player-card rules ... */
-}
-
-/* Pip overlay centered in the portrait */
-.pip-overlay {
-  position: absolute;
-  top: 90%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;            /* <-- force a row */
-  flex-direction: row;      /* <-- just to be explicit */
-  align-items: center;
-  pointer-events: none;
-}
-
-/* Each pip is 60×60, and we nudge them left so they overlap */
-.pip-overlay img {
-  width: 60px;
-  height: 60px;
-  margin-left: -20px;       /* <-- overlap by 20px */
-}
-
-/* Make sure the first pip isn’t shifted off-center */
-.pip-overlay img:first-child {
-  margin-left: 0;
-}
-
-    /* 5B) Card Content (Name, Survivor, Rank, Perks) */
-    .player-card-content {
-      padding: 12px 16px;
-      flex-grow: 1;
+    .player-card {
+      width: 220px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: visible;
+      transition: transform .15s ease-in-out;
+    }
+    .player-card:hover { transform: translateY(-4px); }
+
+    .img-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background-color: #ddd;
+      overflow: visible;
+    }
+    .img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .pip-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+    }
+    .pip-overlay img {
+      width: 60px;
+      height: 60px;
+      margin-left: -20px;
+    }
+    .pip-overlay img:first-child { margin-left: 0; }
+
+    .player-card-content {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
     .player-name {
       font-size: 1.2rem;
       font-weight: bold;
-      margin-bottom: 6px;
       text-align: center;
       color: #2c3e50;
-    }
-    .field {
-      font-size: 0.9rem;
-      margin-bottom: 4px;
     }
     .field span {
       font-weight: 600;
     }
 
-    /* ───────────────────────────────────────────────────────────────────────── */
-    /* 6) All Survivors Grid & Cards */
+    /* ───────────────────────────────────────────────────────── */
+    /* 6) Survivors Grid & Modal */
     .survivors-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
       gap: 12px;
-      margin-top: 10px;
+      margin-top: 30px;
       justify-items: center;
       justify-content: center;
     }
     .survivor-card {
+      width: 100px;
       background-color: #fff;
       border-radius: 6px;
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      width: 100px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
       text-align: center;
-      transition: transform 0.15s ease-in-out;
-    }
-    .survivor-card:hover {
-      transform: translateY(-3px);
+      cursor: pointer;
     }
     .survivor-card img {
       width: 100%;
@@ -213,218 +181,290 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    /* Modal */
+    .modal {
+      position: fixed; top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      position: relative;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 360px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-close {
+      position: absolute;
+      top: 8px; right: 12px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-content img {
+      width: 120px; height: 120px;
+      object-fit: cover; border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    .modal-content ul {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .modal-content li {
+      margin: 6px 0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-
-   <a href="rules.html" class="btn">Rules</a>
-
     <h1>Hardcore Survivor Challenge Progress</h1>
+    <a href="rules.html" class="btn">Rules</a>
+
+    <div id="stats">
+      <span>Total Pips: <span id="totalPips">0</span></span> |
+      <span>Alive: <span id="aliveCount">0</span></span> |
+      <span>Killed: <span id="deadCount">0</span></span>
+    </div>
+
+    <div id="controls">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="alive">Alive</button>
+      <button data-filter="dead">Dead</button>
+    </div>
 
     <div id="loading">
       <div class="spinner"></div>
       <div>Loading data…</div>
     </div>
-
     <div id="error"></div>
 
-    <h2>Players’ Current Survivors</h2>
-    <div id="playersGrid" class="players-grid" style="display: none;"></div>
+    <div id="playersGrid" class="players-grid" style="display:none;"></div>
+    <div id="survivorsGrid" class="survivors-grid" style="display:none;"></div>
+  </div>
 
-    <h2>All Base Survivors</h2>
-    <div id="survivorsGrid" class="survivors-grid" style="display: none;"></div>
+  <!-- Survivor Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <img id="modalImg" src="" alt="" />
+      <h3>Base Perks</h3>
+      <ul id="modalPerks"></ul>
+    </div>
   </div>
 
   <script>
-    /**************************************************************
-     * 1) Configuration: Paste your two CSV URLs (exactly) here
-     **************************************************************/
     const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
     const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
 
-    /**************************************************************
-     * 2) Simple CSV Parser (no quoted‐field support)
-     **************************************************************/
     function parseCSV(text) {
-      const lines   = text.trim().split('\n');
+      const lines = text.trim().split('\n');
       const headers = lines[0].split(',');
-      const records = [];
-      for (let i = 1; i < lines.length; i++) {
-        if (!lines[i].trim()) continue; // skip empty lines
-        const rowParts = lines[i].split(',');
+      return lines.slice(1).filter(l=>l).map(line => {
+        const cols = line.split(',');
         const obj = {};
-        headers.forEach((h, idx) => {
-          obj[h.trim()] = rowParts[idx] ? rowParts[idx].trim() : '';
-        });
-        records.push(obj);
-      }
-      return records;
+        headers.forEach((h,i)=> obj[h.trim()] = (cols[i]||'').trim());
+        return obj;
+      });
     }
 
-    /**************************************************************
-     * 3) Main: Fetch Both CSVs → Parse → Render
-     **************************************************************/
     async function loadAndRender() {
       try {
-        // 3a) Fetch both CSVs in parallel
-        const [respPlayers, respSurvivors] = await Promise.all([
-          fetch(CSV_PLAYERS),
-          fetch(CSV_SURVIVORS)
-        ]);
+        const [r1,r2] = await Promise.all([fetch(CSV_PLAYERS), fetch(CSV_SURVIVORS)]);
+        if (!r1.ok) throw new Error(`Players fetch ${r1.status}`);
+        if (!r2.ok) throw new Error(`Survivors fetch ${r2.status}`);
+        const playersData   = parseCSV(await r1.text());
+        const survivorsData = parseCSV(await r2.text());
 
-        // 3b) Check for fetch errors
-        if (!respPlayers.ok) {
-          throw new Error(`Failed to fetch players data (status ${respPlayers.status})`);
-        }
-        if (!respSurvivors.ok) {
-          throw new Error(`Failed to fetch survivors data (status ${respSurvivors.status})`);
-        }
-
-        // 3c) Read the CSV text
-        const textPlayers   = await respPlayers.text();
-        const textSurvivors = await respSurvivors.text();
-
-        // 3d) Parse into arrays of objects
-        const playersData   = parseCSV(textPlayers);
-        const survivorsData = parseCSV(textSurvivors);
-
-        // 3e) Hide the loading spinner
+        // Hide spinner
         document.getElementById('loading').style.display = 'none';
 
+        // Stats
+        const totalPips  = playersData.reduce((sum,r)=>
+          sum + (parseInt(r.Pips)||0), 0);
+        const aliveCount = survivorsData.filter(r=>r.Status.toLowerCase()==='alive').length;
+        const deadCount  = survivorsData.length - aliveCount;
+        document.getElementById('totalPips').textContent = totalPips;
+        document.getElementById('aliveCount').textContent = aliveCount;
+        document.getElementById('deadCount').textContent  = deadCount;
 
-                /************************************************
-         * 4) Render “Players” (with Pips overlay+text)
-         ************************************************/
+        // Render Players
         const pGrid = document.getElementById('playersGrid');
         pGrid.style.display = 'flex';
-
         playersData.forEach(row => {
-          // 1) Pull in Pips along with the other fields
-          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed, Twitch } = row;
-          const pipCount = parseInt(Pips) || 0;
+          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed,
+                  Twitch, Status } = row;
+          const pipCount = parseInt(Pips)||0;
 
-          // 2) Create the card wrapper
           const card = document.createElement('div');
           card.className = 'player-card';
+          card.dataset.status = (Status||'').toLowerCase();
 
-          // 3) Portrait + pip-overlay container
+          // Portrait + pips
           const imgContainer = document.createElement('div');
           imgContainer.className = 'img-container';
-
           const img = document.createElement('img');
-          img.src = ImageURL || '';
-          img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+          img.src = ImageURL; img.alt = Survivor;
           imgContainer.appendChild(img);
 
           const pipOverlay = document.createElement('div');
           pipOverlay.className = 'pip-overlay';
-          const PIP_URL = 'https://i.imgur.com/KgiVO6X.png'; // ← your transparent pip icon
-          for (let i = 0; i < pipCount; i++) {
-            const pipImg = document.createElement('img');
-            pipImg.src = PIP_URL;
-            pipImg.alt = 'pip';
-            pipOverlay.appendChild(pipImg);
+          const PIP_URL = 'https://i.imgur.com/abcdefghijkl.png';
+          for(let i=0;i<pipCount;i++){
+            const pi = document.createElement('img');
+            pi.src = PIP_URL; pi.alt='pip';
+            pipOverlay.appendChild(pi);
           }
-       
-         // wrap imgContainer in a link if we have a Twitch URL
-if (Twitch) {
-  const link = document.createElement('a');
-  link.href = Twitch;
-  link.target = '_blank';
-  link.rel = 'noopener';
-  link.appendChild(imgContainer);
-  card.appendChild(link);
-} else {
-  // no Twitch URL? just append the container
-  card.appendChild(imgContainer);
-}
-         
-         imgContainer.appendChild(pipOverlay);
+          imgContainer.appendChild(pipOverlay);
 
-          // 4) Card content (name, survivor, rank, perks, pips text)
+          // Twitch embed if present
+          if (Twitch) {
+            const chan = (Twitch.match(/twitch\.tv\/([^\/]+)/)||[])[1];
+            if (chan) {
+              const ifr = document.createElement('iframe');
+              ifr.src = `https://player.twitch.tv/?channel=${chan}&parent=hardcoresurvivor.xyz`;
+              ifr.width = '220'; ifr.height='120';
+              ifr.setAttribute('allowfullscreen','');
+              card.appendChild(ifr);
+            }
+          }
+
+          // Wrap or append imgContainer
+          card.appendChild(imgContainer);
+
+          // Info
           const content = document.createElement('div');
           content.className = 'player-card-content';
 
-          // Name
           const nameEl = document.createElement('div');
-          nameEl.className = 'player-name';
-          nameEl.textContent = Player || 'Unknown Player';
+          nameEl.className='player-name'; nameEl.textContent=Player;
           content.appendChild(nameEl);
 
-          // Survivor
-const survEl = document.createElement('div');
-survEl.className = 'field';
-survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
-content.appendChild(survEl);
+          const survEl = document.createElement('div');
+          survEl.className='field';
+          survEl.innerHTML=`<span>Survivor:</span> ${Survivor}`;
+          content.appendChild(survEl);
 
-// Perks  (now immediately after Survivor)
-const perksEl = document.createElement('div');
-perksEl.className = 'field';
-perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-content.appendChild(perksEl);
+          const perksEl = document.createElement('div');
+          perksEl.className='field';
+          perksEl.innerHTML=`<span>Perks:</span> ${PerksAllowed}`;
+          content.appendChild(perksEl);
 
-// Rank   (now moved to just before Pips)
-const rankEl = document.createElement('div');
-rankEl.className = 'field';
-rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
-content.appendChild(rankEl);
+          const rankEl = document.createElement('div');
+          rankEl.className='field';
+          rankEl.innerHTML=`<span>Rank:</span> ${Rank}`;
+          content.appendChild(rankEl);
 
-// Pips text
-const pipsText = document.createElement('div');
-pipsText.className = 'field';
-pipsText.innerHTML = `<span>Pips:</span> ${pipCount}`;
-content.appendChild(pipsText);
-
+          const pipsText = document.createElement('div');
+          pipsText.className='field';
+          pipsText.innerHTML=`<span>Pips:</span> ${pipCount}`;
+          content.appendChild(pipsText);
 
           card.appendChild(content);
           pGrid.appendChild(card);
         });
 
-
-        /************************************************
-         * 5) Render “All Survivors” (with status color)
-         ************************************************/
+        // Render Survivors
         const sGrid = document.getElementById('survivorsGrid');
         sGrid.style.display = 'grid';
-
-        survivorsData.forEach(row => {
-          const { Survivor, Status, ImageURL } = row;
-
-          // Survivor card
+        survivorsData.forEach((row,i) => {
+          const { Survivor, Status, ImageURL, BasePerks } = row;
           const card = document.createElement('div');
-          card.className = 'survivor-card';
+          card.className='survivor-card';
+          card.dataset.status = (Status||'').toLowerCase();
+          card.dataset.name = Survivor;
+          card.dataset.image = ImageURL;
+          card.dataset.perks = BasePerks;
 
-          // Portrait
           const img = document.createElement('img');
-          img.src = ImageURL || '';
-          img.alt = Survivor ? `${Survivor} portrait` : 'No portrait';
+          img.src = ImageURL; img.alt = Survivor;
           card.appendChild(img);
 
-          // Name (green if alive, red if dead)
           const nameEl = document.createElement('div');
-          nameEl.className = 'survivor-name';
-          nameEl.textContent = Survivor || '';
-          if (Status && Status.toLowerCase() === 'dead') {
-            nameEl.style.color = '#c0392b';
-          } else {
-            nameEl.style.color = '#27ae60';
-          }
+          nameEl.className='survivor-name'; nameEl.textContent=Survivor;
+          nameEl.style.color = (Status.toLowerCase()==='dead') ? '#c0392b':'#27ae60';
           card.appendChild(nameEl);
+         
+            // Existing: when a survivor card is clicked…
+card.addEventListener('click', ()=> {
+  const perksList = BasePerks.split(',').map(p=>p.trim());
+  const ul = document.getElementById('modalPerks');
+  ul.innerHTML = '';            // clear old items
 
-          sGrid.appendChild(card);
+  perksList.forEach(perkName => {
+    // 1) create the list item with the perk’s name
+    const li = document.createElement('li');
+    li.textContent = perkName;
+    ul.appendChild(li);
+
+    // 2) fetch the intro extract from Fandom MediaWiki API
+    fetch(
+      `https://deadbydaylight.fandom.com/api.php` +
+      `?action=query` +
+      `&format=json` +
+      `&prop=extracts` +
+      `&exintro=1` +
+      `&explaintext=1` +
+      `&titles=${encodeURIComponent(perkName)}` +
+      `&origin=*`
+    )
+    .then(r => r.json())
+    .then(data => {
+      // the API returns pages keyed by pageid
+      const pages = data.query.pages;
+      const page = pages[Object.keys(pages)[0]];
+      // extract is the plain‐text intro
+      const desc = page.extract || 'No description available.';
+      // 3) append a <p> with the description
+      const p = document.createElement('p');
+      p.textContent = desc;
+      p.style.margin = '6px 0 12px';
+      p.style.fontSize = '0.9rem';
+      p.style.lineHeight = '1.3';
+      li.appendChild(p);
+    })
+    .catch(() => {
+      // on error, optionally show nothing or a message
+    });
+  });
+
+  // … then show the modal as before …
+});
+
+
+        // Filters
+        document.getElementById('controls').addEventListener('click', e=> {
+          if (!e.target.dataset.filter) return;
+          const f = e.target.dataset.filter;
+          Array.from(document.querySelectorAll('#controls button'))
+            .forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
+          document.querySelectorAll('.player-card, .survivor-card').forEach(c=>{
+            c.style.display = (f==='all'||c.dataset.status===f)
+              ? '' 
+              : 'none';
+          });
         });
 
+        // Modal close
+        document.querySelector('.modal-close').onclick = ()=> {
+          document.getElementById('modal').style.display='none';
+        };
+        document.getElementById('modal')
+          .addEventListener('click', e=> {
+            if (e.target.id==='modal') e.target.style.display='none';
+          });
+
       } catch (err) {
-        // Show error message
-        document.getElementById('loading').style.display = 'none';
-        const errorEl = document.getElementById('error');
-        errorEl.style.display = 'block';
-        errorEl.textContent = 'Error loading data: ' + err.message;
+        document.getElementById('loading').style.display='none';
+        const eEl = document.getElementById('error');
+        eEl.style.display='block';
+        eEl.textContent = 'Error loading data: ' + err.message;
       }
     }
 
-    // Run when page loads
     document.addEventListener('DOMContentLoaded', loadAndRender);
   </script>
 </body>
