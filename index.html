@@ -262,15 +262,34 @@
     const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
 
     function parseCSV(text) {
-      const lines = text.trim().split('\n');
-      const headers = lines[0].split(',');
-      return lines.slice(1).filter(l=>l).map(line => {
-        const cols = line.split(',');
-        const obj = {};
-        headers.forEach((h,i)=> obj[h.trim()] = (cols[i]||'').trim());
-        return obj;
-      });
+  const lines = text.trim().split('\n');
+  const headers = splitCSVLine(lines[0]);
+  return lines.slice(1).filter(l => l).map(line => {
+    const cols = splitCSVLine(line);
+    const obj = {};
+    headers.forEach((h,i) => {
+      obj[h.trim()] = (cols[i] || '').trim();
+    });
+    return obj;
+  });
+
+  // Splits one CSV line into fields, respecting quoted commas
+  function splitCSVLine(line) {
+    const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
+    const result = [];
+    let match;
+    while (match = re.exec(line)) {
+      if (match[1] !== undefined) {
+        // grab the quoted field, un-escape any double-quotes
+        result.push(match[1].replace(/""/g, '"'));
+      } else {
+        result.push(match[2]);
+      }
     }
+    return result;
+  }
+}
+
 
     async function loadAndRender() {
       try {
