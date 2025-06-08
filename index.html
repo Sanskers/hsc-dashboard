@@ -220,14 +220,17 @@
       try {
         // 3A) Preload ALL perk descriptions
         const perkDescriptions = {};
-        const perksResp = await fetch(
-  'https://api.allorigins.win/raw?url=' +
+        // PRELOAD ALL Survivor perk descriptions via Codetabs proxy
+const perksResp = await fetch(
+  'https://api.codetabs.com/v1/proxy?quest=' +
     encodeURIComponent('https://dbd.tricky.lol/api/perks')
 );
-        const perksJson = await perksResp.json();
-        Object.values(perksJson).forEach(p => {
-          perkDescriptions[p.name] = p.description.trim();
-        });
+
+const perksJson = await perksResp.json();
+Object.values(perksJson).forEach(p => {
+  perkDescriptions[p.name] = p.description.trim();
+});
+
 
         // 3B) Fetch your CSV data
         const [r1,r2] = await Promise.all([
