@@ -353,28 +353,29 @@ if (Twitch) {
           content.appendChild(nameEl);
 
           // Survivor
-          const survEl = document.createElement('div');
-          survEl.className = 'field';
-          survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
-          content.appendChild(survEl);
+const survEl = document.createElement('div');
+survEl.className = 'field';
+survEl.innerHTML = `<span>Survivor:</span> ${Survivor || '-'}`;
+content.appendChild(survEl);
 
-          // Rank
-          const rankEl = document.createElement('div');
-          rankEl.className = 'field';
-          rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
-          content.appendChild(rankEl);
+// Perks  (now immediately after Survivor)
+const perksEl = document.createElement('div');
+perksEl.className = 'field';
+perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
+content.appendChild(perksEl);
 
-          // Perks
-          const perksEl = document.createElement('div');
-          perksEl.className = 'field';
-          perksEl.innerHTML = `<span>Perks:</span> ${PerksAllowed || '0'}`;
-          content.appendChild(perksEl);
+// Rank   (now moved to just before Pips)
+const rankEl = document.createElement('div');
+rankEl.className = 'field';
+rankEl.innerHTML = `<span>Rank:</span> ${Rank || '-'}`;
+content.appendChild(rankEl);
 
-          // ─── NEW: Textual Pips count ───
-          const pipsText = document.createElement('div');
-          pipsText.className = 'field';
-          pipsText.innerHTML = `<span>Pips:</span> ${pipCount}`;
-          content.appendChild(pipsText);
+// Pips text
+const pipsText = document.createElement('div');
+pipsText.className = 'field';
+pipsText.innerHTML = `<span>Pips:</span> ${pipCount}`;
+content.appendChild(pipsText);
+
 
           card.appendChild(content);
           pGrid.appendChild(card);
