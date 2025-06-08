@@ -404,63 +404,75 @@
           card.appendChild(nameEl);
 
           card.addEventListener('click', () => {
-  // 1) Grab the raw perks string
-  const perksRaw = row.BasePerks || '';
+  const perkRaw    = row.BasePerks || '';
+  const perksList  = perkRaw.split(/\s*,\s*/).filter(p => p);
 
-  // 2) Split on commas (trimming whitespace) and drop any empties
-  const perksList = perksRaw
-    .split(/\s*,\s*/)
-    .filter(p => p);
-
-  // 3) Clear out any previous list items
   const ul = document.getElementById('modalPerks');
   ul.innerHTML = '';
 
-  // 4) For each perk, create an <li> then fetch its description
   perksList.forEach(perkName => {
-    const li = document.createElement('li');
+    const li    = document.createElement('li');
     const title = document.createElement('strong');
     title.textContent = perkName;
     li.appendChild(title);
     ul.appendChild(li);
 
-    // Replace your existing fetch(…exintro…) call with:
-fetch(
-  'https://deadbydaylight.fandom.com/api.php' +
-  '?action=parse&format=json&prop=text' +
-  '&page=' + encodeURIComponent(perkName) +
-  '&section=1' +
-  '&origin=*'
-)
-.then(r => r.json())
-.then(data => {
-  // the API returns HTML of section 1 here
-  const html = data.parse.text['*'];
-  // strip out tags so you only get the raw text
-  const temp = document.createElement('div');
-  temp.innerHTML = html;
-  const text = temp.textContent.trim();
-  const p = document.createElement('p');
-  p.textContent = text;
-  p.style.margin = '4px 0 12px';
-  p.style.fontSize = '0.9rem';
-  li.appendChild(p);
-})
+    // 1) First: fetch the section index for the “Effect” (mechanics) section
+    fetch(
+      'https://deadbydaylight.fandom.com/api.php' +
+      '?action=parse&format=json&prop=sections' +
+      '&page=' + encodeURIComponent(perkName) +
+      '&origin=*'
+    )
+    .then(r => r.json())
+    .then(data => {
+      const secs = data.parse.sections;
+      // look for a section whose heading contains Effect|Function|Gameplay
+      let secObj = secs.find(s =>
+        /Effect|Function|Gameplay/i.test(s.line)
+      );
+      // fallback to the very next section if none matched
+      if (!secObj) secObj = secs.find(s => parseInt(s.index,10) > 1);
+      const secIdx = secObj ? secObj.index : 1;
 
-    .catch(() => {
+      // 2) Now fetch only that section’s HTML
+      return fetch(
+        'https://deadbydaylight.fandom.com/api.php' +
+        '?action=parse&format=json&prop=text' +
+        '&page=' + encodeURIComponent(perkName) +
+        '&section=' + secIdx +
+        '&origin=*'
+      )
+      .then(r => r.json());
+    })
+    .then(data => {
+      // strip HTML to plain text
+      const html = data.parse.text['*'];
+      const tmp  = document.createElement('div');
+      tmp.innerHTML = html;
+      const text = tmp.textContent.trim();
+      const p    = document.createElement('p');
+      p.textContent = text;
+      p.style.margin = '4px 0 12px';
+      p.style.fontSize = '0.9rem';
+      li.appendChild(p);
+    })
+    .catch(err => {
       const p = document.createElement('p');
       p.textContent = 'Description unavailable.';
       p.style.margin = '4px 0 12px';
       p.style.fontSize = '0.9rem';
       li.appendChild(p);
+      console.warn(`Failed to load perks for ${perkName}:`, err);
     });
   });
 
-  // 5) Finally show the modal
+  // finally open the modal
   document.getElementById('modalTitle').textContent = row.Survivor;
-  document.getElementById('modalImg').src = row.ImageURL;
+  document.getElementById('modalImg').src        = row.ImageURL;
   document.getElementById('modal').style.display = 'flex';
 });
+
 
 
 
