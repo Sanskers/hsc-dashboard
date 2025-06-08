@@ -424,25 +424,29 @@
     li.appendChild(title);
     ul.appendChild(li);
 
-    // Fetch first-paragraph from Wiki
-    fetch(
-      'https://deadbydaylight.fandom.com/api.php' +
-      '?action=query&format=json&prop=extracts' +
-      '&exintro=1&explaintext=1' +
-      '&titles=' + encodeURIComponent(perkName) +
-      '&origin=*'
-    )
-    .then(r => r.json())
-    .then(data => {
-      const pages = data.query.pages;
-      const page  = pages[Object.keys(pages)[0]];
-      const desc  = page.extract || 'No description available.';
-      const p     = document.createElement('p');
-      p.textContent = desc;
-      p.style.margin = '4px 0 12px';
-      p.style.fontSize = '0.9rem';
-      li.appendChild(p);
-    })
+    // Replace your existing fetch(…exintro…) call with:
+fetch(
+  'https://deadbydaylight.fandom.com/api.php' +
+  '?action=parse&format=json&prop=text' +
+  '&page=' + encodeURIComponent(perkName) +
+  '&section=1' +
+  '&origin=*'
+)
+.then(r => r.json())
+.then(data => {
+  // the API returns HTML of section 1 here
+  const html = data.parse.text['*'];
+  // strip out tags so you only get the raw text
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  const text = temp.textContent.trim();
+  const p = document.createElement('p');
+  p.textContent = text;
+  p.style.margin = '4px 0 12px';
+  p.style.fontSize = '0.9rem';
+  li.appendChild(p);
+})
+
     .catch(() => {
       const p = document.createElement('p');
       p.textContent = 'Description unavailable.';
