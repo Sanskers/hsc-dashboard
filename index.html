@@ -291,19 +291,8 @@
 }
     
 
-// PRELOAD: fetch all Survivor perks (with descriptions) in one call
-const perkDescriptions = {};
+fetch('https://dbd.tricky.lol/api/randomperks?role=survivor')
 
-fetch('https://dbd.tricky.lol/api/perks')
-  .then(r => r.json())
-  .then(json => {
-    // json is an object of { id: { name, description, … }, … } :contentReference[oaicite:0]{index=0}
-    Object.values(json).forEach(perk => {
-      // map display‐name → in‐game description
-      perkDescriptions[perk.name] = perk.description.trim();
-    });
-  })
-  .catch(err => console.warn('Failed to load all perk descriptions', err));
 
 
 
