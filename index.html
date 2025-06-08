@@ -4,11 +4,9 @@
   <meta charset="UTF-8" />
   <title>Hardcore Survivor Challenge Progress</title>
   <style>
-    /* ───────────────────────────────────────────────────────── */
-    /* 1) Reset & Background */
+    /* Reset & Background */
     body, html {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: Arial, sans-serif;
       background-image: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg");
       background-repeat: no-repeat;
@@ -18,204 +16,137 @@
       background-color: #f5f5f5;
       color: #333;
     }
-
-    /* ───────────────────────────────────────────────────────── */
-    /* 2) Container & Buttons */
+    /* Container & Buttons */
     .container {
       max-width: 960px;
       margin: 40px auto;
       padding: 20px;
       background-color: rgba(255,255,255,0.9);
       border-radius: 8px;
+      text-align: center;
     }
     .btn, #controls button {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      background-color: #3498db;
-      color: #fff;
-      text-decoration: none;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      display: inline-block; padding: 0.5rem 1rem;
+      background-color: #3498db; color: #fff;
+      border: none; border-radius: 4px; cursor: pointer;
       margin: 0 5px 15px;
     }
-    .btn:hover, #controls button:hover {
-      background-color: #2980b9;
-    }
-    #controls button.active {
-      background-color: #2980b9;
-    }
+    .btn:hover, #controls button:hover { background-color: #2980b9; }
+    #controls button.active { background-color: #2980b9; }
 
-    /* ───────────────────────────────────────────────────────── */
-    /* 3) Stats & Filters */
-    #stats {
-      text-align: center;
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
+    /* Stats & Filters */
+    #stats { font-weight: bold; margin-bottom: 20px; }
     #stats span { margin: 0 10px; }
+    #controls { margin-bottom: 20px; }
 
-    #controls {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    /* ───────────────────────────────────────────────────────── */
-    /* 4) Loading Spinner & Error */
-    #loading {
-      text-align: center;
-      margin-top: 60px;
-    }
+    /* Spinner & Error */
+    #loading { text-align: center; margin-top: 60px; }
     .spinner {
       border: 6px solid #f3f3f3;
       border-top: 6px solid #3498db;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      width: 50px; height: 50px;
       animation: spin 1s linear infinite;
       margin: 0 auto 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     #error {
       display: none;
-      text-align: center;
       color: #e74c3c;
       margin-top: 40px;
       font-size: 1.1rem;
     }
 
-    /* ───────────────────────────────────────────────────────── */
-    /* 5) Players Grid & Cards */
+    /* Players Grid */
     .players-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
+      display: flex; flex-wrap: wrap;
+      gap: 20px; justify-content: center;
     }
     .player-card {
-      width: 220px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: visible;
+      width: 220px; background: #fff;
+      border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: relative; overflow: visible;
+      display: flex; flex-direction: column;
       transition: transform .15s ease-in-out;
     }
     .player-card:hover { transform: translateY(-4px); }
-
     .img-container {
       position: relative;
-      width: 100%;
-      height: 200px;
-      background-color: #ddd;
-      overflow: visible;
+      width: 100%; height: 200px;
+      background: #ddd; overflow: visible;
     }
     .img-container img {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       object-fit: cover;
-      display: block;
     }
     .pip-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      align-items: center;
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      display: flex; align-items: center;
       pointer-events: none;
     }
     .pip-overlay img {
-      width: 60px;
-      height: 60px;
+      width: 60px; height: 60px;
       margin-left: -20px;
     }
     .pip-overlay img:first-child { margin-left: 0; }
-
     .player-card-content {
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      padding: 12px 16px; display: flex;
+      flex-direction: column; gap: 4px;
     }
     .player-name {
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-align: center;
+      font-size: 1.2rem; font-weight: bold;
       color: #2c3e50;
     }
-    .field span {
-      font-weight: 600;
-    }
+    .field span { font-weight: 600; }
 
-    /* ───────────────────────────────────────────────────────── */
-    /* 6) Survivors Grid & Modal */
+    /* Survivors Grid & Modal */
     .survivors-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 12px;
-      margin-top: 30px;
+      grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+      gap: 12px; margin-top: 30px;
       justify-items: center;
-      justify-content: center;
     }
     .survivor-card {
-      width: 100px;
-      background-color: #fff;
-      border-radius: 6px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-      text-align: center;
-      cursor: pointer;
+      width: 100px; background: #fff;
+      border-radius: 6px; box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      text-align: center; cursor: pointer;
     }
     .survivor-card img {
-      width: 100%;
-      height: 100px;
-      object-fit: cover;
-      background-color: #ddd;
+      width: 100%; height: 100px; object-fit: cover;
+      background: #ddd;
     }
     .survivor-name {
-      font-size: 0.75rem;
-      padding: 4px 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.75rem; padding: 4px 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+
     .modal {
       position: fixed; top:0; left:0;
       width:100%; height:100%;
       background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center; justify-content: center;
+      display: none; align-items: center; justify-content: center;
       z-index: 1000;
     }
     .modal-content {
       position: relative;
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      max-width: 360px;
-      width: 90%;
+      background: #fff; border-radius: 8px;
+      padding: 20px; max-width: 360px; width: 90%;
       text-align: center;
     }
     .modal-close {
-      position: absolute;
-      top: 8px; right: 12px;
-      font-size: 1.5rem;
-      cursor: pointer;
+      position: absolute; top:8px; right:12px;
+      font-size: 1.5rem; cursor: pointer;
     }
     .modal-content img {
-      width: 120px; height: 120px;
-      object-fit: cover; border-radius: 6px;
-      margin-bottom: 12px;
+      width:120px; height:120px;
+      object-fit: cover; border-radius:6px;
+      margin-bottom:12px;
     }
     .modal-content ul {
-      list-style: none; padding: 0; margin: 0;
-      text-align: left;
+      list-style: none; padding: 0; margin: 0; text-align: left;
     }
-    .modal-content li {
-      margin: 6px 0;
-    }
+    .modal-content li { margin: 6px 0; }
   </style>
 </head>
 <body>
@@ -245,7 +176,7 @@
     <div id="survivorsGrid" class="survivors-grid" style="display:none;"></div>
   </div>
 
-  <!-- Survivor Modal -->
+  <!-- Modal -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span class="modal-close">&times;</span>
@@ -257,82 +188,74 @@
   </div>
 
   <script>
-    // ─────────────────────────────────────────────────────────
-    // PRELOAD all Survivor perk descriptions from tricky.lol API
-    const perkDescriptions = {};
-    fetch('https://dbd.tricky.lol/api/perks')
-      .then(r => r.json())
-      .then(json => {
-        Object.values(json).forEach(perk => {
-          perkDescriptions[perk.name] = perk.description.trim();
-        });
-        console.log('Loaded', Object.keys(perkDescriptions).length, 'perk descriptions');
-      })
-      .catch(err => console.warn('Failed to load perk descriptions:', err));
-    // ─────────────────────────────────────────────────────────
-
-    const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
-    const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
-
+    // ───────────────────────────────────────────────
+    // 1) Helper: robust CSV splitting (handles quoted commas)
     function splitCSVLine(line) {
       const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
-      const result = [];
-      let match;
-      while (match = re.exec(line)) {
-        if (match[1] !== undefined) {
-          result.push(match[1].replace(/""/g, '"'));
-        } else {
-          result.push(match[2]);
-        }
+      const res = []; let m;
+      while (m = re.exec(line)) {
+        res.push(m[1] !== undefined
+          ? m[1].replace(/""/g,'"')
+          : m[2]);
       }
-      return result;
+      return res;
     }
-
     function parseCSV(text) {
       const lines = text.trim().split('\n');
       const headers = splitCSVLine(lines[0]);
-      return lines.slice(1).filter(l => l).map(line => {
+      return lines.slice(1).filter(l=>l).map(line => {
         const cols = splitCSVLine(line);
         const obj = {};
-        headers.forEach((h,i) => {
-          obj[h.trim()] = (cols[i] || '').trim();
-        });
+        headers.forEach((h,i) => obj[h.trim()] = (cols[i]||'').trim());
         return obj;
       });
     }
 
+    // 2) Your sheet URLs
+    const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
+    const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
+
+    // 3) The main sequence: load perks & CSVs, then render
     async function loadAndRender() {
       try {
-        const [respP, respS] = await Promise.all([
+        // 3A) Preload ALL perk descriptions
+        const perkDescriptions = {};
+        const perksResp = await fetch('https://dbd.tricky.lol/api/perks');
+        const perksJson = await perksResp.json();
+        Object.values(perksJson).forEach(p => {
+          perkDescriptions[p.name] = p.description.trim();
+        });
+
+        // 3B) Fetch your CSV data
+        const [r1,r2] = await Promise.all([
           fetch(CSV_PLAYERS),
           fetch(CSV_SURVIVORS)
         ]);
-        if (!respP.ok) throw new Error(`Players fetch ${respP.status}`);
-        if (!respS.ok) throw new Error(`Survivors fetch ${respS.status}`);
+        if (!r1.ok) throw new Error(`Players fetch ${r1.status}`);
+        if (!r2.ok) throw new Error(`Survivors fetch ${r2.status}`);
+        const playersData   = parseCSV(await r1.text());
+        const survivorsData = parseCSV(await r2.text());
 
-        const playersData   = parseCSV(await respP.text());
-        const survivorsData = parseCSV(await respS.text());
-
+        // 3C) Hide loading
         document.getElementById('loading').style.display = 'none';
 
-        // Stats
-        const totalPips  = playersData.reduce((sum,r)=> sum + (parseInt(r.Pips)||0), 0);
+        // 3D) Compute stats
+        const totalPips  = playersData.reduce((sum,r)=>sum+(parseInt(r.Pips)||0),0);
         const aliveCount = survivorsData.filter(r=>r.Status.toLowerCase()==='alive').length;
         const deadCount  = survivorsData.length - aliveCount;
         document.getElementById('totalPips').textContent = totalPips;
         document.getElementById('aliveCount').textContent = aliveCount;
         document.getElementById('deadCount').textContent  = deadCount;
 
-        // Render Players
+        // 4) Render Players
         const pGrid = document.getElementById('playersGrid');
         pGrid.style.display = 'flex';
         playersData.forEach(row => {
           const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed, Twitch, Status } = row;
           const pipCount = parseInt(Pips)||0;
-
           const card = document.createElement('div');
           card.className = 'player-card';
-          card.dataset.status = (Status||'').toLowerCase();
+          card.dataset.status = Status.toLowerCase();
 
           // Portrait + pips
           const imgContainer = document.createElement('div');
@@ -340,137 +263,110 @@
           const img = document.createElement('img');
           img.src = ImageURL; img.alt = Survivor;
           imgContainer.appendChild(img);
-
-          const pipOverlay = document.createElement('div');
-          pipOverlay.className = 'pip-overlay';
+          const overlay = document.createElement('div');
+          overlay.className = 'pip-overlay';
           const PIP_URL = 'https://i.imgur.com/KgiVO6X.png';
-          for(let i=0;i<pipCount;i++){
+          for (let i=0;i<pipCount;i++){
             const pi = document.createElement('img');
             pi.src = PIP_URL; pi.alt='pip';
-            pipOverlay.appendChild(pi);
+            overlay.appendChild(pi);
           }
-          imgContainer.appendChild(pipOverlay);
+          imgContainer.appendChild(overlay);
 
-          // Twitch embed
+          // Optional Twitch embed
           if (Twitch) {
             const channel = Twitch.split('/').pop();
             const ifr = document.createElement('iframe');
             ifr.src = `https://player.twitch.tv/?channel=${channel}&parent=${location.hostname}`;
-            ifr.width = '220'; ifr.height='120';
-            ifr.setAttribute('allowfullscreen','');
+            ifr.width='220'; ifr.height='120';
+            ifr.allow = 'fullscreen';
             card.appendChild(ifr);
           }
-
           card.appendChild(imgContainer);
 
-          // Info
-          const content = document.createElement('div');
-          content.className = 'player-card-content';
+          // Info box
+          const info = document.createElement('div');
+          info.className = 'player-card-content';
+          info.innerHTML = `
+            <div class="player-name">${Player}</div>
+            <div class="field"><span>Survivor:</span> ${Survivor}</div>
+            <div class="field"><span>Perks:</span> ${PerksAllowed}</div>
+            <div class="field"><span>Rank:</span> ${Rank}</div>
+            <div class="field"><span>Pips:</span> ${pipCount}</div>
+          `;
+          card.appendChild(info);
 
-          const nameEl = document.createElement('div');
-          nameEl.className='player-name'; nameEl.textContent=Player;
-          content.appendChild(nameEl);
-
-          const survEl = document.createElement('div');
-          survEl.className='field';
-          survEl.innerHTML=`<span>Survivor:</span> ${Survivor}`;
-          content.appendChild(survEl);
-
-          const perksEl = document.createElement('div');
-          perksEl.className='field';
-          perksEl.innerHTML=`<span>Perks:</span> ${PerksAllowed}`;
-          content.appendChild(perksEl);
-
-          const rankEl = document.createElement('div');
-          rankEl.className='field';
-          rankEl.innerHTML=`<span>Rank:</span> ${Rank}`;
-          content.appendChild(rankEl);
-
-          const pipsText = document.createElement('div');
-          pipsText.className='field';
-          pipsText.innerHTML=`<span>Pips:</span> ${pipCount}`;
-          content.appendChild(pipsText);
-
-          card.appendChild(content);
           pGrid.appendChild(card);
         });
 
-        // Render Survivors
+        // 5) Render Survivors & hook up modal
         const sGrid = document.getElementById('survivorsGrid');
         sGrid.style.display = 'grid';
         survivorsData.forEach(row => {
           const { Survivor, Status, ImageURL, BasePerks } = row;
           const card = document.createElement('div');
-          card.className='survivor-card';
-          card.dataset.status = (Status||'').toLowerCase();
-          card.dataset.name = Survivor;
-          card.dataset.image = ImageURL;
-          card.dataset.perks = BasePerks;
+          card.className = 'survivor-card';
+          card.dataset.status = Status.toLowerCase();
 
           const img = document.createElement('img');
           img.src = ImageURL; img.alt = Survivor;
           card.appendChild(img);
 
           const nameEl = document.createElement('div');
-          nameEl.className='survivor-name'; nameEl.textContent=Survivor;
-          nameEl.style.color = (Status.toLowerCase()==='dead') ? '#c0392b':'#27ae60';
+          nameEl.className = 'survivor-name';
+          nameEl.style.color = Status.toLowerCase()==='dead' ? '#c0392b' : '#27ae60';
+          nameEl.textContent = Survivor;
           card.appendChild(nameEl);
 
-          // Click handler shows modal w/ descriptions
           card.addEventListener('click', () => {
-            const perksRaw  = row.BasePerks || '';
-            const perksList = perksRaw.split(/\s*,\s*/).filter(p => p);
-            const ul        = document.getElementById('modalPerks');
+            const perksRaw  = BasePerks || '';
+            const perksList = perksRaw.split(/\s*,\s*/).filter(p=>p);
+            const ul = document.getElementById('modalPerks');
             ul.innerHTML = '';
-
-            perksList.forEach(perkName => {
+            perksList.forEach(pName => {
               const li    = document.createElement('li');
               const title = document.createElement('strong');
-              title.textContent = perkName;
+              title.textContent = pName;
               li.appendChild(title);
-
-              const desc = perkDescriptions[perkName];
-              const p    = document.createElement('p');
-              p.textContent = desc || 'Description unavailable.';
+              const pDesc = perkDescriptions[pName];
+              const p     = document.createElement('p');
+              p.textContent = pDesc || 'Description unavailable.';
               p.style.margin   = '4px 0 12px';
               p.style.fontSize = '0.9rem';
               li.appendChild(p);
-
               ul.appendChild(li);
             });
-
-            document.getElementById('modalTitle').textContent = row.Survivor;
-            document.getElementById('modalImg').src        = row.ImageURL;
+            document.getElementById('modalTitle').textContent = Survivor;
+            document.getElementById('modalImg').src = ImageURL;
             document.getElementById('modal').style.display = 'flex';
           });
 
           sGrid.appendChild(card);
         });
 
-        // Filters
+        // 6) Filters
         document.getElementById('controls').addEventListener('click', e => {
-          const btn = e.target;
-          if (!btn.dataset.filter) return;
-          const f = btn.dataset.filter;
+          if (!e.target.dataset.filter) return;
+          const f = e.target.dataset.filter;
           document.querySelectorAll('#controls button')
-            .forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+            .forEach(b => b.classList.toggle('active', b.dataset.filter===f));
           document.querySelectorAll('.player-card, .survivor-card')
-            .forEach(c => c.style.display = (f==='all' || c.dataset.status===f) ? '' : 'none');
+            .forEach(c => c.style.display = (f==='all'||c.dataset.status===f)?'' : 'none');
         });
 
-        // Modal close
+        // 7) Modal close
         document.querySelector('.modal-close').onclick = () => {
           document.getElementById('modal').style.display = 'none';
         };
         document.getElementById('modal').addEventListener('click', e => {
-          if (e.target.id === 'modal') e.target.style.display = 'none';
+          if (e.target.id==='modal') e.target.style.display = 'none';
         });
 
       } catch (err) {
         document.getElementById('loading').style.display = 'none';
-        const eEl = document.getElementById('error');
-        eEl.style.display = 'block';
-        eEl.textContent = 'Error loading data: ' + err.message;
+        const e = document.getElementById('error');
+        e.style.display = 'block';
+        e.textContent = 'Error: ' + err.message;
       }
     }
 
