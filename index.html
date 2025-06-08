@@ -325,27 +325,40 @@ Object.values(perksJson).forEach(p => {
           card.appendChild(nameEl);
 
           card.addEventListener('click', () => {
-            const perksRaw  = BasePerks || '';
-            const perksList = perksRaw.split(/\s*,\s*/).filter(p=>p);
-            const ul = document.getElementById('modalPerks');
-            ul.innerHTML = '';
-            perksList.forEach(pName => {
-              const li    = document.createElement('li');
-              const title = document.createElement('strong');
-              title.textContent = pName;
-              li.appendChild(title);
-              const pDesc = perkDescriptions[pName];
-              const p     = document.createElement('p');
-              p.textContent = pDesc || 'Description unavailable.';
-              p.style.margin   = '4px 0 12px';
-              p.style.fontSize = '0.9rem';
-              li.appendChild(p);
-              ul.appendChild(li);
-            });
-            document.getElementById('modalTitle').textContent = Survivor;
-            document.getElementById('modalImg').src = ImageURL;
-            document.getElementById('modal').style.display = 'flex';
-          });
+  // 1) Split your BasePerks CSV into an array
+  const perksRaw  = row.BasePerks || '';
+  const perksList = perksRaw.split(/\s*,\s*/).filter(p => p);
+
+  // 2) Clear out old list items
+  const ul = document.getElementById('modalPerks');
+  ul.innerHTML = '';
+
+  // 3) For each perk, create <li> + <p> from our preloaded map
+  perksList.forEach(perkName => {
+    const li = document.createElement('li');
+
+    // Name in bold
+    const title = document.createElement('strong');
+    title.textContent = perkName;
+    li.appendChild(title);
+
+    // Description from tricky.lol map
+    const desc = perkDescriptions[perkName];
+    const p    = document.createElement('p');
+    p.textContent = desc || 'Description unavailable.';
+    p.style.margin   = '4px 0 12px';
+    p.style.fontSize = '0.9rem';
+    li.appendChild(p);
+
+    ul.appendChild(li);
+  });
+
+  // 4) Show the modal
+  document.getElementById('modalTitle').textContent = row.Survivor;
+  document.getElementById('modalImg').src        = row.ImageURL;
+  document.getElementById('modal').style.display = 'flex';
+});
+
 
           sGrid.appendChild(card);
         });
