@@ -32,7 +32,6 @@
       padding: 0.5rem 1rem;
       background-color: #3498db;
       color: #fff;
-      text-decoration: none;
       border: none;
       border-radius: 4px;
       cursor: pointer;
@@ -113,7 +112,7 @@
     }
     .pip-overlay {
       position: absolute;
-      top: 80%;
+      top: 75%;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -207,6 +206,12 @@
     }
     .modal-content li {
       margin: 6px 0;
+      display: flex;
+      align-items: flex-start;
+    }
+    .modal-content li img {
+      margin-right: 8px;
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -287,7 +292,8 @@
         Object.values(perksJson).forEach(p => {
           perkDataMap[p.name] = {
             template: p.description,
-            tunables: p.tunables
+            tunables: p.tunables,
+            image:     p.image
           };
         });
 
@@ -391,19 +397,29 @@
 
             perksList.forEach(perkName => {
               const li = document.createElement('li');
+
+              const data = perkDataMap[perkName];
+              // icon
+              if (data && data.image) {
+                const icon = document.createElement('img');
+                icon.src = 'https://dbd.tricky.lol/' + data.image;
+                icon.alt = perkName + ' icon';
+                icon.style.width = '32px';
+                icon.style.height = '32px';
+                li.appendChild(icon);
+              }
+
               const title = document.createElement('strong');
               title.textContent = perkName;
               li.appendChild(title);
 
-              // lookup & inject tier-1 values
-              const data = perkDataMap[perkName];
+              // inject tier-1 tunable values
               let desc = data?.template || '';
               desc = desc.replace(/\{(\d+)\}/g, (_, idx) => {
                 const arr = data.tunables[+idx];
                 return (arr && arr[0] != null) ? arr[0] : '';
               });
-
-              // remove any HTML tags & collapse whitespace
+              // remove HTML tags & collapse whitespace
               desc = desc.replace(/<[^>]+>/g, ' ')
                          .replace(/\s+/g, ' ')
                          .trim();
