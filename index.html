@@ -212,6 +212,7 @@
     }
     .modal-content ul {
       list-style: none; padding: 0; margin: 0;
+      text-align: left;
     }
     .modal-content li {
       margin: 6px 0;
@@ -283,8 +284,7 @@
         document.getElementById('loading').style.display = 'none';
 
         // Stats
-        const totalPips  = playersData.reduce((sum,r)=>
-          sum + (parseInt(r.Pips)||0), 0);
+        const totalPips  = playersData.reduce((sum,r)=> sum + (parseInt(r.Pips)||0), 0);
         const aliveCount = survivorsData.filter(r=>r.Status.toLowerCase()==='alive').length;
         const deadCount  = survivorsData.length - aliveCount;
         document.getElementById('totalPips').textContent = totalPips;
@@ -295,8 +295,7 @@
         const pGrid = document.getElementById('playersGrid');
         pGrid.style.display = 'flex';
         playersData.forEach(row => {
-          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed,
-                  Twitch, Status } = row;
+          const { Player, Survivor, ImageURL, Rank, Pips, PerksAllowed, Twitch, Status } = row;
           const pipCount = parseInt(Pips)||0;
 
           const card = document.createElement('div');
@@ -320,19 +319,16 @@
           }
           imgContainer.appendChild(pipOverlay);
 
-          // Twitch embed if present
+          // Twitch embed
           if (Twitch) {
-            const chan = (Twitch.match(/twitch\.tv\/([^\/]+)/)||[])[1];
-            if (chan) {
-              const ifr = document.createElement('iframe');
-              ifr.src = `https://player.twitch.tv/?channel=${chan}&parent=hardcoresurvivor.xyz`;
-              ifr.width = '220'; ifr.height='120';
-              ifr.setAttribute('allowfullscreen','');
-              card.appendChild(ifr);
-            }
+            const channel = Twitch.split('/').pop();
+            const ifr = document.createElement('iframe');
+            ifr.src = `https://player.twitch.tv/?channel=${channel}&parent=${location.hostname}`;
+            ifr.width = '220'; ifr.height='120';
+            ifr.setAttribute('allowfullscreen','');
+            card.appendChild(ifr);
           }
 
-          // Wrap or append imgContainer
           card.appendChild(imgContainer);
 
           // Info
@@ -370,7 +366,7 @@
         // Render Survivors
         const sGrid = document.getElementById('survivorsGrid');
         sGrid.style.display = 'grid';
-        survivorsData.forEach((row,i) => {
+        survivorsData.forEach(row => {
           const { Survivor, Status, ImageURL, BasePerks } = row;
           const card = document.createElement('div');
           card.className='survivor-card';
@@ -387,75 +383,40 @@
           nameEl.className='survivor-name'; nameEl.textContent=Survivor;
           nameEl.style.color = (Status.toLowerCase()==='dead') ? '#c0392b':'#27ae60';
           card.appendChild(nameEl);
-         
-            // Existing: when a survivor card is clicked…
-card.addEventListener('click', ()=> {
-  const perksList = BasePerks.split(',').map(p=>p.trim());
-  const ul = document.getElementById('modalPerks');
-  ul.innerHTML = '';            // clear old items
 
-  perksList.forEach(perkName => {
-    // 1) create the list item with the perk’s name
-    const li = document.createElement('li');
-    li.textContent = perkName;
-    ul.appendChild(li);
+          card.addEventListener('click', ()=> {
+            document.getElementById('modalTitle').textContent = Survivor;
+            document.getElementById('modalImg').src = ImageURL;
+            const ul = document.getElementById('modalPerks');
+            ul.innerHTML = '';
+            BasePerks.split(',').forEach(p=>{
+              const li = document.createElement('li');
+              li.textContent = p.trim();
+              ul.appendChild(li);
+            });
+            document.getElementById('modal').style.display = 'flex';
+          });
 
-    // 2) fetch the intro extract from Fandom MediaWiki API
-    fetch(
-      `https://deadbydaylight.fandom.com/api.php` +
-      `?action=query` +
-      `&format=json` +
-      `&prop=extracts` +
-      `&exintro=1` +
-      `&explaintext=1` +
-      `&titles=${encodeURIComponent(perkName)}` +
-      `&origin=*`
-    )
-    .then(r => r.json())
-    .then(data => {
-      // the API returns pages keyed by pageid
-      const pages = data.query.pages;
-      const page = pages[Object.keys(pages)[0]];
-      // extract is the plain‐text intro
-      const desc = page.extract || 'No description available.';
-      // 3) append a <p> with the description
-      const p = document.createElement('p');
-      p.textContent = desc;
-      p.style.margin = '6px 0 12px';
-      p.style.fontSize = '0.9rem';
-      p.style.lineHeight = '1.3';
-      li.appendChild(p);
-    })
-    .catch(() => {
-      // on error, optionally show nothing or a message
-    });
-  });
-
-  // … then show the modal as before …
-});
-
+          sGrid.appendChild(card);
+        });
 
         // Filters
         document.getElementById('controls').addEventListener('click', e=> {
           if (!e.target.dataset.filter) return;
           const f = e.target.dataset.filter;
-          Array.from(document.querySelectorAll('#controls button'))
+          document.querySelectorAll('#controls button')
             .forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
-          document.querySelectorAll('.player-card, .survivor-card').forEach(c=>{
-            c.style.display = (f==='all'||c.dataset.status===f)
-              ? '' 
-              : 'none';
-          });
+          document.querySelectorAll('.player-card, .survivor-card')
+            .forEach(c=> c.style.display = (f==='all'||c.dataset.status===f)?'':'none');
         });
 
         // Modal close
         document.querySelector('.modal-close').onclick = ()=> {
           document.getElementById('modal').style.display='none';
         };
-        document.getElementById('modal')
-          .addEventListener('click', e=> {
-            if (e.target.id==='modal') e.target.style.display='none';
-          });
+        document.getElementById('modal').addEventListener('click', e=> {
+          if (e.target.id==='modal') e.target.style.display='none';
+        });
 
       } catch (err) {
         document.getElementById('loading').style.display='none';
