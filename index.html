@@ -325,27 +325,33 @@ Object.values(perksJson).forEach(p => {
           card.appendChild(nameEl);
 
           card.addEventListener('click', () => {
-  // 1) Split your BasePerks CSV into an array
   const perksRaw  = row.BasePerks || '';
   const perksList = perksRaw.split(/\s*,\s*/).filter(p => p);
 
-  // 2) Clear out old list items
   const ul = document.getElementById('modalPerks');
   ul.innerHTML = '';
 
-  // 3) For each perk, create <li> + <p> from our preloaded map
   perksList.forEach(perkName => {
-    const li = document.createElement('li');
-
-    // Name in bold
+    const li    = document.createElement('li');
     const title = document.createElement('strong');
     title.textContent = perkName;
     li.appendChild(title);
 
-    // Description from tricky.lol map
-    const desc = perkDescriptions[perkName];
-    const p    = document.createElement('p');
-    p.textContent = desc || 'Description unavailable.';
+    // 1) Lookup raw description from tricky.lol map
+    let rawDesc = perkDescriptions[perkName] || '';
+
+    // 2) Strip any leftover <br> tags
+    rawDesc = rawDesc.replace(/<br\s*\/?>/gi, ' ');
+
+    // 3) Remove placeholder tokens like {0}, {1}, etc.
+    rawDesc = rawDesc.replace(/\{\d+\}/g, '');
+
+    // 4) Collapse any multiple spaces into one, trim ends
+    const cleanDesc = rawDesc.replace(/\s+/g, ' ').trim();
+
+    // 5) Insert into a <p>
+    const p = document.createElement('p');
+    p.textContent = cleanDesc || 'Description unavailable.';
     p.style.margin   = '4px 0 12px';
     p.style.fontSize = '0.9rem';
     li.appendChild(p);
@@ -353,11 +359,12 @@ Object.values(perksJson).forEach(p => {
     ul.appendChild(li);
   });
 
-  // 4) Show the modal
+  // Show the modal
   document.getElementById('modalTitle').textContent = row.Survivor;
   document.getElementById('modalImg').src        = row.ImageURL;
   document.getElementById('modal').style.display = 'flex';
 });
+
 
 
           sGrid.appendChild(card);
