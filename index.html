@@ -120,7 +120,7 @@
     }
     .pip-overlay {
       position: absolute;
-      top: 90%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: flex;
@@ -181,7 +181,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    /* Modal */
     .modal {
       position: fixed; top:0; left:0;
       width:100%; height:100%;
@@ -258,55 +257,62 @@
   </div>
 
   <script>
+    // ─────────────────────────────────────────────────────────
+    // PRELOAD all Survivor perk descriptions from tricky.lol API
+    const perkDescriptions = {};
+    fetch('https://dbd.tricky.lol/api/perks')
+      .then(r => r.json())
+      .then(json => {
+        Object.values(json).forEach(perk => {
+          perkDescriptions[perk.name] = perk.description.trim();
+        });
+        console.log('Loaded', Object.keys(perkDescriptions).length, 'perk descriptions');
+      })
+      .catch(err => console.warn('Failed to load perk descriptions:', err));
+    // ─────────────────────────────────────────────────────────
+
     const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
     const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
 
-// ─── PRELOAD ALL SURVIVOR PERK DESCRIPTIONS ───
-const perkDescriptions = {};
-
-fetch('https://dbd.tricky.lol/api/perks')
-  .then(r => r.json())
-  .then(json => {
-    // json is an object: { id: { name, description, … }, … }
-    Object.values(json).forEach(perk => {
-      perkDescriptions[perk.name] = perk.description.trim();
-    });
-    console.log('Loaded perkDescriptions for', Object.keys(perkDescriptions).length, 'perks');
-  })
-  .catch(err => console.warn('Failed to load perk descriptions:', err));
-
-    
-    function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = splitCSVLine(lines[0]);
-  return lines.slice(1).filter(l => l).map(line => {
-    const cols = splitCSVLine(line);
-    const obj = {};
-    headers.forEach((h,i) => {
-      obj[h.trim()] = (cols[i] || '').trim();
-    });
-    return obj;
-  });
-
-  // Splits one CSV line into fields, respecting quoted commas
-  function splitCSVLine(line) {
-    const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
-    const result = [];
-    let match;
-    while (match = re.exec(line)) {
-      if (match[1] !== undefined) {
-        // grab the quoted field, un-escape any double-quotes
-        result.push(match[1].replace(/""/g, '"'));
-      } else {
-        result.push(match[2]);
+    function splitCSVLine(line) {
+      const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
+      const result = [];
+      let match;
+      while (match = re.exec(line)) {
+        if (match[1] !== undefined) {
+          result.push(match[1].replace(/""/g, '"'));
+        } else {
+          result.push(match[2]);
+        }
       }
+      return result;
     }
-    return result;
-  }
-}
-   
 
-        // Hide spinner
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = splitCSVLine(lines[0]);
+      return lines.slice(1).filter(l => l).map(line => {
+        const cols = splitCSVLine(line);
+        const obj = {};
+        headers.forEach((h,i) => {
+          obj[h.trim()] = (cols[i] || '').trim();
+        });
+        return obj;
+      });
+    }
+
+    async function loadAndRender() {
+      try {
+        const [respP, respS] = await Promise.all([
+          fetch(CSV_PLAYERS),
+          fetch(CSV_SURVIVORS)
+        ]);
+        if (!respP.ok) throw new Error(`Players fetch ${respP.status}`);
+        if (!respS.ok) throw new Error(`Survivors fetch ${respS.status}`);
+
+        const playersData   = parseCSV(await respP.text());
+        const survivorsData = parseCSV(await respS.text());
+
         document.getElementById('loading').style.display = 'none';
 
         // Stats
@@ -410,64 +416,60 @@ fetch('https://dbd.tricky.lol/api/perks')
           nameEl.style.color = (Status.toLowerCase()==='dead') ? '#c0392b':'#27ae60';
           card.appendChild(nameEl);
 
-          // ─────────────────────────────────────────────────────────
-// NEW HANDLER: look up descriptions in our preloaded JSON map
-card.addEventListener('click', () => {
-  const perksRaw  = row.BasePerks || '';
-  const perksList = perksRaw.split(/\s*,\s*/).filter(p => p);
+          // Click handler shows modal w/ descriptions
+          card.addEventListener('click', () => {
+            const perksRaw  = row.BasePerks || '';
+            const perksList = perksRaw.split(/\s*,\s*/).filter(p => p);
+            const ul        = document.getElementById('modalPerks');
+            ul.innerHTML = '';
 
-  const ul = document.getElementById('modalPerks');
-  ul.innerHTML = '';
+            perksList.forEach(perkName => {
+              const li    = document.createElement('li');
+              const title = document.createElement('strong');
+              title.textContent = perkName;
+              li.appendChild(title);
 
-  perksList.forEach(perkName => {
-    const li    = document.createElement('li');
-    const title = document.createElement('strong');
-    title.textContent = perkName;
-    li.appendChild(title);
+              const desc = perkDescriptions[perkName];
+              const p    = document.createElement('p');
+              p.textContent = desc || 'Description unavailable.';
+              p.style.margin   = '4px 0 12px';
+              p.style.fontSize = '0.9rem';
+              li.appendChild(p);
 
-    // lookup the description from our map
-    const desc = perkDescriptions[perkName];
-    const p    = document.createElement('p');
-    p.textContent = desc || 'Description unavailable.';
-    p.style.margin   = '4px 0 12px';
-    p.style.fontSize = '0.9rem';
-    li.appendChild(p);
+              ul.appendChild(li);
+            });
 
-    ul.appendChild(li);
-  });
+            document.getElementById('modalTitle').textContent = row.Survivor;
+            document.getElementById('modalImg').src        = row.ImageURL;
+            document.getElementById('modal').style.display = 'flex';
+          });
 
-  // finally show the modal
-  document.getElementById('modalTitle').textContent = row.Survivor;
-  document.getElementById('modalImg').src        = row.ImageURL;
-  document.getElementById('modal').style.display = 'flex';
-});
-// ─────────────────────────────────────────────────────────
-          
           sGrid.appendChild(card);
         });
 
         // Filters
-        document.getElementById('controls').addEventListener('click', e=> {
-          if (!e.target.dataset.filter) return;
-          const f = e.target.dataset.filter;
+        document.getElementById('controls').addEventListener('click', e => {
+          const btn = e.target;
+          if (!btn.dataset.filter) return;
+          const f = btn.dataset.filter;
           document.querySelectorAll('#controls button')
-            .forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
+            .forEach(b => b.classList.toggle('active', b.dataset.filter === f));
           document.querySelectorAll('.player-card, .survivor-card')
-            .forEach(c=> c.style.display = (f==='all'||c.dataset.status===f)?'':'none');
+            .forEach(c => c.style.display = (f==='all' || c.dataset.status===f) ? '' : 'none');
         });
 
         // Modal close
-        document.querySelector('.modal-close').onclick = ()=> {
-          document.getElementById('modal').style.display='none';
+        document.querySelector('.modal-close').onclick = () => {
+          document.getElementById('modal').style.display = 'none';
         };
-        document.getElementById('modal').addEventListener('click', e=> {
-          if (e.target.id==='modal') e.target.style.display='none';
+        document.getElementById('modal').addEventListener('click', e => {
+          if (e.target.id === 'modal') e.target.style.display = 'none';
         });
 
-       catch (err) {
-        document.getElementById('loading').style.display='none';
+      } catch (err) {
+        document.getElementById('loading').style.display = 'none';
         const eEl = document.getElementById('error');
-        eEl.style.display='block';
+        eEl.style.display = 'block';
         eEl.textContent = 'Error loading data: ' + err.message;
       }
     }
