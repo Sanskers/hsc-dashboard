@@ -261,7 +261,7 @@ Object.values(perksJson).forEach(p => {
           const pipCount = parseInt(Pips)||0;
           const card = document.createElement('div');
           card.className = 'player-card';
-          card.dataset.status = Status.toLowerCase();
+          card.dataset.status = (row.Status || 'all').toLowerCase();
 
           // Portrait + pips
           const imgContainer = document.createElement('div');
@@ -312,7 +312,7 @@ Object.values(perksJson).forEach(p => {
           const { Survivor, Status, ImageURL, BasePerks } = row;
           const card = document.createElement('div');
           card.className = 'survivor-card';
-          card.dataset.status = Status.toLowerCase();
+          card.dataset.status = (row.Status || 'all').toLowerCase();
 
           const img = document.createElement('img');
           img.src = ImageURL; img.alt = Survivor;
