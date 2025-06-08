@@ -220,7 +220,10 @@
       try {
         // 3A) Preload ALL perk descriptions
         const perkDescriptions = {};
-        const perksResp = await fetch('https://dbd.tricky.lol/api/perks');
+        const perksResp = await fetch(
+  'https://api.allorigins.win/raw?url=' +
+    encodeURIComponent('https://dbd.tricky.lol/api/perks')
+);
         const perksJson = await perksResp.json();
         Object.values(perksJson).forEach(p => {
           perkDescriptions[p.name] = p.description.trim();
