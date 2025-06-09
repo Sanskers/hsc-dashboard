@@ -12,6 +12,7 @@
                   no-repeat center/cover fixed;
       color: #333;
     }
+
     /* Container */
     .container {
       max-width: 960px;
@@ -21,6 +22,7 @@
       border-radius: 8px;
       position: relative;
     }
+
     /* Header */
     .header {
       display: flex;
@@ -44,16 +46,32 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .btn:hover, #controls button:hover { background: #2980b9; }
-    #controls button.active { background: #2980b9; }
+    .btn:hover, #controls button:hover {
+      background: #2980b9;
+    }
+    #controls button.active {
+      background: #2980b9;
+    }
 
     /* Stats & Filters */
-    #stats { text-align: center; font-weight: bold; margin: 20px 0; }
-    #stats span { margin: 0 10px; }
-    #controls { text-align: center; margin-bottom: 20px; }
+    #stats {
+      text-align: center;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    #stats span {
+      margin: 0 10px;
+    }
+    #controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
     /* Loading & Error */
-    #loading { text-align: center; margin-top: 60px; }
+    #loading {
+      text-align: center;
+      margin-top: 60px;
+    }
     .spinner {
       border: 6px solid #f3f3f3;
       border-top: 6px solid #3498db;
@@ -87,7 +105,9 @@
       flex-direction: column;
       transition: transform .15s ease;
     }
-    .player-card:hover { transform: translateY(-4px); }
+    .player-card:hover {
+      transform: translateY(-4px);
+    }
     .img-container {
       position: relative;
       width: 100%;
@@ -109,9 +129,13 @@
       pointer-events: none;
     }
     .pip-overlay img {
-      width: 60px; height: 60px; margin-left: -20px;
+      width: 60px;
+      height: 60px;
+      margin-left: -20px;
     }
-    .pip-overlay img:first-child { margin-left: 0; }
+    .pip-overlay img:first-child {
+      margin-left: 0;
+    }
     .player-card-content {
       padding: 12px 16px;
       display: flex;
@@ -133,12 +157,24 @@
       justify-items: center;
     }
     .survivor-card {
+      position: relative;    /* enable overlay */
       width: 100px;
       background: #fff;
       border-radius: 6px;
       box-shadow: 0 1px 6px rgba(0,0,0,0.08);
       cursor: pointer;
       text-align: center;
+    }
+    /* Killed-by overlay */
+    .survivor-card .death-info {
+      position: absolute;
+      top: 0; left: 0; width: 100%;
+      background: rgba(255,255,255,0.85);
+      color: #c0392b;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 2px 0;
+      pointer-events: none;
     }
     .survivor-card img {
       width: 100%;
@@ -156,8 +192,7 @@
 
     /* Modal */
     .modal {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.7);
       display: none;
@@ -174,10 +209,8 @@
       position: relative;
     }
     .modal-close {
-      position: absolute;
-      top: 8px; right: 12px;
-      font-size: 1.5rem;
-      cursor: pointer;
+      position: absolute; top: 8px; right: 12px;
+      font-size: 1.5rem; cursor: pointer;
     }
     .modal-content img {
       width: 120px; height: 120px;
@@ -191,12 +224,10 @@
       margin: 6px 0;
     }
     .modal-content li strong {
-      display: block;
-      margin-bottom: 4px;
+      display: block; margin-bottom: 4px;
     }
     .modal-content li p {
-      margin: 0 0 12px;
-      font-size: 0.9rem;
+      margin: 0 0 12px; font-size: 0.9rem;
     }
   </style>
 </head>
@@ -256,7 +287,7 @@
     function parseCSV(text) {
       const lines = text.trim().split('\n');
       const headers = splitCSVLine(lines[0]);
-      return lines.slice(1).filter(l=>l).map(l => {
+      return lines.slice(1).filter(l => l).map(l => {
         const cols = splitCSVLine(l), obj = {};
         headers.forEach((h,i) => obj[h.trim()] = (cols[i]||'').trim());
         return obj;
@@ -281,12 +312,6 @@
             tunables: p.tunables
           };
         });
-
-        // manual overrides for any perks you want to hard-code
-const manualDescriptions = {
-  "Repressed Alliance": 
-    "After repairing generators for 40 seconds, you can call upon The Entity to block the generator you’re working on, preventing an approaching Killer from regressing its progress for 30 seconds."
-};
 
         // 2) Fetch CSVs
         const [r1, r2] = await Promise.all([fetch(CSV_PLAYERS), fetch(CSV_SURVIVORS)]);
@@ -353,7 +378,7 @@ const manualDescriptions = {
           pGrid.appendChild(card);
         });
 
-        // 5) Render Survivors & Modal (no icons)
+        // 5) Render Survivors & Modal
         const sGrid = document.getElementById('survivorsGrid');
         sGrid.style.display = 'grid';
         survivors.forEach(r => {
@@ -361,6 +386,15 @@ const manualDescriptions = {
           card.className = 'survivor-card';
           card.dataset.status = (r.Status||'all').toLowerCase();
 
+          // Killed-by overlay
+          if (r.Status.toLowerCase() === 'dead' && r.KilledBy) {
+            const death = document.createElement('div');
+            death.className = 'death-info';
+            death.textContent = `Killed by: ${r.KilledBy}`;
+            card.appendChild(death);
+          }
+
+          // Portrait & name
           const imgEl = document.createElement('img');
           imgEl.src = r.ImageURL; imgEl.alt = r.Survivor;
           card.appendChild(imgEl);
@@ -368,52 +402,37 @@ const manualDescriptions = {
           const nm = document.createElement('div');
           nm.className = 'survivor-name';
           nm.textContent = r.Survivor;
-          nm.style.color = r.Status?.toLowerCase()==='dead' ? '#c0392b' : '#27ae60';
+          nm.style.color = r.Status.toLowerCase() === 'dead' ? '#c0392b' : '#27ae60';
           card.appendChild(nm);
 
+          // Modal click handler
           card.addEventListener('click', () => {
             const ul = document.getElementById('modalPerks');
             ul.innerHTML = '';
 
-            (r.BasePerks || '')
-  .split(/\s*,\s*/)
-  .filter(p => p)
-  .forEach(perkName => {
-    const li = document.createElement('li');
+            (r.BasePerks || '').split(/\s*,\s*/).filter(p=>p).forEach(perkName => {
+              const data = perkMap[perkName];
+              const li = document.createElement('li');
 
-    // 2) manual override wins
-    let desc = manualDescriptions[perkName];
+              const title = document.createElement('strong');
+              title.textContent = perkName;
+              li.appendChild(title);
 
-    if (!desc) {
-      // 3) otherwise, look up from the API map directly
-      const data = perkMap[perkName];
-      desc = data?.template || "";
+              let desc = data?.template || '';
+              desc = desc.replace(/\{(\d+)\}/g, (_,i) => {
+                const arr = data.tunables[+i];
+                return Array.isArray(arr) ? arr[0] : '';
+              })
+              .replace(/<[^>]+>/g,' ')
+              .replace(/\s+/g,' ')
+              .trim();
 
-      // inject tier-1 numbers & strip HTML
-      desc = desc
-        .replace(/\{(\d+)\}/g, (_, i) => {
-          const arr = data.tunables[+i];
-          return Array.isArray(arr) ? arr[0] : "";
-        })
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
+              const p = document.createElement('p');
+              p.textContent = desc || 'Description unavailable.';
+              li.appendChild(p);
 
-    // 4) fallback if still empty
-    if (!desc) desc = "Description unavailable.";
-
-    // 5) build the item
-    const title = document.createElement("strong");
-    title.textContent = perkName;
-    li.appendChild(title);
-
-    const p = document.createElement("p");
-    p.textContent = desc;
-    li.appendChild(p);
-
-    ul.appendChild(li);
-  });
+              ul.appendChild(li);
+            });
 
             document.getElementById('modalTitle').textContent = r.Survivor;
             document.getElementById('modalImg').src = r.ImageURL;
@@ -437,8 +456,8 @@ const manualDescriptions = {
         document.querySelector('.modal-close').onclick = () => {
           document.getElementById('modal').style.display = 'none';
         };
-        document.getElementById('modal').addEventListener('click', e=>{
-          if (e.target.id==='modal') e.target.style.display='none';
+        document.getElementById('modal').addEventListener('click', e => {
+          if (e.target.id === 'modal') e.target.style.display = 'none';
         });
 
       } catch (err) {
