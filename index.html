@@ -313,14 +313,15 @@
               const li = document.createElement('li');
 
               if (data?.image) {
-                const icon = document.createElement('img');
-                icon.src = 'https://api.allorigins.win/raw?url=' +
-                  encodeURIComponent('https://dbd.tricky.lol/' + data.image);
-                icon.alt = name + ' icon';
-                icon.width = 32;
-                icon.height = 32;
-                li.appendChild(icon);
-              }
+  const icon = document.createElement('img');
+  // proxy the binary PNG through ThingProxy so CORS isn’t an issue
+  icon.src = 'https://thingproxy.freeboard.io/fetch/https://dbd.tricky.lol/' + data.image;
+  icon.alt    = perkName + ' icon';
+  icon.width  = 32;
+  icon.height = 32;
+  li.insertBefore(icon, li.firstChild);
+}
+
 
               const title = document.createElement('strong');
               title.textContent = name;
