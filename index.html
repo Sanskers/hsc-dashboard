@@ -381,15 +381,15 @@ const manualDescriptions = {
   .forEach(perkName => {
     const li = document.createElement('li');
 
-    // 1) Try manual override first
+    // 2) manual override wins
     let desc = manualDescriptions[perkName];
 
     if (!desc) {
-      // 2) Fallback to your API lookup
-      const lookupKey = lowerMap[perkName.toLowerCase().trim()];
-      const data      = lookupKey ? perkMap[lookupKey] : null;
-
+      // 3) otherwise, look up from the API map directly
+      const data = perkMap[perkName];
       desc = data?.template || "";
+
+      // inject tier-1 numbers & strip HTML
       desc = desc
         .replace(/\{(\d+)\}/g, (_, i) => {
           const arr = data.tunables[+i];
@@ -400,9 +400,10 @@ const manualDescriptions = {
         .trim();
     }
 
+    // 4) fallback if still empty
     if (!desc) desc = "Description unavailable.";
 
-    // 3) Build the list item
+    // 5) build the item
     const title = document.createElement("strong");
     title.textContent = perkName;
     li.appendChild(title);
