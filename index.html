@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Hardcore Survivor Challenge Progress</title>
   <style>
-    /* Reset & Background */
+    /* ─ Reset & Background ───────────────────────────────────────────── */
     body, html {
       margin: 0; padding: 0;
       font-family: Arial, sans-serif;
@@ -13,60 +13,98 @@
       color: #333;
     }
 
-    /* Container */
+    /* ─ Container ────────────────────────────────────────────────────── */
     .container {
       max-width: 960px;
       margin: 40px auto;
       padding: 20px;
-      background: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.6); /* more transparent */
       border-radius: 8px;
       position: relative;
     }
 
-    /* Header */
+    /* ─ Overall Progress Bar ────────────────────────────────────────── */
+    #overallProgressContainer {
+      position: relative;
+      height: 40px;
+      margin-bottom: 20px;
+    }
+    #overallProgress {
+      position: absolute; top: 50%; left: 0;
+      width: 100%; height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      transform: translateY(-50%);
+    }
+    #runner, #exitIcon {
+      position: absolute; top: 50%;
+      transform: translateY(-50%);
+      font-size: 28px;
+      pointer-events: none;
+    }
+    #runner { left: 0%; }
+    #exitIcon { right: 0; }
+
+    /* ─ Header ───────────────────────────────────────────────────────── */
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .header h1 {
-      margin: 0; flex: 1; text-align: center; font-size: 1.8rem;
+      margin: 0; flex: 1;
+      text-align: center;
+      font-size: 1.8rem;
     }
     .header .btn {
       flex: 0 0 auto;
     }
     .btn, #controls button {
-      padding: 0.5rem 1rem; background: #3498db; color: #fff;
-      border: none; border-radius: 4px; cursor: pointer;
+      padding: 0.5rem 1rem;
+      background: #3498db; color: #fff;
+      border: none; border-radius: 4px;
+      cursor: pointer;
     }
     .btn:hover, #controls button:hover { background: #2980b9; }
     #controls button.active { background: #2980b9; }
 
-    /* Stats & Filters */
-    #stats { text-align: center; font-weight: bold; margin: 20px 0; }
+    /* ─ Stats & Filters ──────────────────────────────────────────────── */
+    #stats {
+      text-align: center; font-weight: bold;
+      margin: 20px 0;
+    }
     #stats span { margin: 0 10px; }
     #controls { text-align: center; margin-bottom: 20px; }
 
-    /* Loading & Error */
-    #loading { text-align: center; margin-top: 60px; }
+    /* ─ Loading & Error ─────────────────────────────────────────────── */
+    #loading {
+      text-align: center; margin-top: 60px;
+    }
     .spinner {
-      border: 6px solid #f3f3f3; border-top: 6px solid #3498db;
-      border-radius: 50%; width: 50px; height: 50px;
-      animation: spin 1s linear infinite; margin: 0 auto 10px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px; height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     #error {
-      display: none; text-align: center; color: #e74c3c; margin-top: 40px;
+      display: none; text-align: center;
+      color: #e74c3c; margin-top: 40px;
     }
 
-    /* Players Grid */
+    /* ─ Players Grid ────────────────────────────────────────────────── */
     .players-grid {
-      display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+      display: flex; flex-wrap: wrap;
+      gap: 20px; justify-content: center;
     }
     .player-card {
-      width: 220px; background: #fff; border-radius: 8px;
+      width: 220px; background: #fff;
+      border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: flex; flex-direction: column; overflow: visible;
+      display: flex; flex-direction: column;
+      overflow: visible;
       transition: transform .15s ease;
     }
     .player-card:hover { transform: translateY(-4px); }
@@ -79,31 +117,39 @@
     }
     .pip-overlay {
       position: absolute; top: 75%; left: 50%;
-      transform: translateX(-50%); display: flex; pointer-events: none;
+      transform: translateX(-50%); display: flex;
+      pointer-events: none;
     }
     .pip-overlay img {
       width: 60px; height: 60px; margin-left: -20px;
     }
     .pip-overlay img:first-child { margin-left: 0; }
     .player-card-content {
-      padding: 12px 16px; display: flex; flex-direction: column; gap: 4px;
+      padding: 12px 16px;
+      display: flex; flex-direction: column;
+      gap: 4px;
     }
     .player-name {
-      font-size: 1.2rem; font-weight: bold; text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
     }
 
-    /* Survivors Grid */
+    /* ─ Survivors Grid ─────────────────────────────────────────────── */
     .survivors-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
-      gap: 12px; margin-top: 30px; justify-items: center;
+      gap: 12px; margin-top: 30px;
+      justify-items: center;
     }
     .survivor-card {
-      position: relative; /* for overlay */
-      width: 100px; background: #fff; border-radius: 6px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08); cursor: pointer;
-      text-align: center;
+      position: relative;
+      width: 100px; background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      cursor: pointer; text-align: center;
     }
+    /* Killed-by overlay */
     .survivor-card .death-info {
       position: absolute; top: 0; left: 0; width: 100%;
       background: rgba(255,255,255,0.85);
@@ -111,26 +157,55 @@
       padding: 2px 0; pointer-events: none;
     }
     .survivor-card img {
-      width: 100%; height: 100px; object-fit: cover; background: #ddd;
+      width: 100%; height: 100px;
+      object-fit: cover; background: #ddd;
     }
     .survivor-name {
-      font-size: 0.75rem; padding: 4px 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-size: 0.75rem;
+      padding: 4px 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* Modal */
+    /* ─ Kill Feed ───────────────────────────────────────────────────── */
+    #killFeedContainer {
+      margin-top: 30px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 6px;
+      padding: 10px;
+    }
+    #killFeedContainer h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    #killFeed {
+      max-height: 200px; overflow-y: auto;
+      font-size: 0.9rem; text-align: left;
+    }
+    #killFeed div {
+      margin-bottom: 6px;
+    }
+
+    /* ─ Modal ───────────────────────────────────────────────────────── */
     .modal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); display: none;
-      align-items: center; justify-content: center; z-index: 1000;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
     }
     .modal-content {
       background: #fff; border-radius: 8px; padding: 20px;
-      width: 90%; max-width: 360px; text-align: center; position: relative;
+      width: 90%; max-width: 360px;
+      text-align: center; position: relative;
     }
     .modal-close {
-      position: absolute; top: 8px; right: 12px; font-size: 1.5rem;
-      cursor: pointer;
+      position: absolute; top: 8px; right: 12px;
+      font-size: 1.5rem; cursor: pointer;
     }
     .modal-content img {
       width: 120px; height: 120px; object-fit: cover;
@@ -152,34 +227,50 @@
 </head>
 <body>
   <div class="container">
+    <!-- Overall progress bar -->
+    <div id="overallProgressContainer">
+      <div id="overallProgress"></div>
+      <div id="runner">🏃</div>
+      <div id="exitIcon">🚪</div>
+    </div>
+
+    <!-- Header -->
     <div class="header">
       <a href="rules.html" class="btn">Rules</a>
       <h1>Hardcore Survivor Challenge Progress</h1>
     </div>
 
+    <!-- Stats & Filters -->
     <div id="stats">
       <span>Total Pips: <span id="totalPips">0</span></span> |
       <span>Alive: <span id="aliveCount">0</span></span> |
       <span>Killed: <span id="deadCount">0</span></span>
     </div>
-
     <div id="controls">
       <button data-filter="all" class="active">All</button>
       <button data-filter="alive">Alive</button>
       <button data-filter="dead">Dead</button>
     </div>
 
+    <!-- Loading / Error -->
     <div id="loading">
       <div class="spinner"></div>
       <div>Loading data…</div>
     </div>
     <div id="error"></div>
 
+    <!-- Grids -->
     <div id="playersGrid" class="players-grid" style="display:none;"></div>
     <div id="survivorsGrid" class="survivors-grid" style="display:none;"></div>
+
+    <!-- Kill Feed -->
+    <div id="killFeedContainer">
+      <h2>Kill Feed</h2>
+      <div id="killFeed"></div>
+    </div>
   </div>
 
-  <!-- Survivor Modal -->
+  <!-- Modal -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span class="modal-close">&times;</span>
@@ -191,7 +282,7 @@
   </div>
 
   <script>
-    // CSV parsing
+    // CSV parsing helpers
     function splitCSVLine(line) {
       const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
       const arr = []; let m;
@@ -213,12 +304,13 @@
       });
     }
 
-    const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
-    const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=88342992&single=true&output=csv';
+    // CSV URLs
+    const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/…/pub?gid=0&single=true&output=csv';
+    const CSV_SURVIVORS = 'https://docs.google.com/spreadsheets/d/e/…/pub?gid=88342992&single=true&output=csv';
 
     async function loadAndRender() {
       try {
-        // 1) Preload perks JSON
+        // 1) Load perks JSON
         const perkMap = {};
         const resp = await fetch(
           'https://api.codetabs.com/v1/proxy?quest=' +
@@ -226,10 +318,7 @@
         );
         const perksJson = await resp.json();
         Object.values(perksJson).forEach(p => {
-          perkMap[p.name] = {
-            template: p.description,
-            tunables: p.tunables
-          };
+          perkMap[p.name] = { template: p.description, tunables: p.tunables };
         });
 
         // 2) Manual override for Repressed Alliance
@@ -246,13 +335,19 @@
 
         document.getElementById('loading').style.display = 'none';
 
-        // 4) Stats
+        // 4) Compute stats and overall progress
         const totalPips  = players.reduce((sum,r)=>sum+(+r.Pips||0),0);
         const aliveCount = survivors.filter(r=>r.Status?.toLowerCase()==='alive').length;
         const deadCount  = survivors.length - aliveCount;
         document.getElementById('totalPips').textContent  = totalPips;
         document.getElementById('aliveCount').textContent = aliveCount;
         document.getElementById('deadCount').textContent  = deadCount;
+
+        // Move runner along bar (by survivors killed / total)
+        const progressRatio = survivors.length
+          ? deadCount / survivors.length
+          : 0;
+        document.getElementById('runner').style.left = `${progressRatio * 100}%`;
 
         // 5) Render Players
         const pGrid = document.getElementById('playersGrid');
@@ -303,7 +398,7 @@
           pGrid.appendChild(card);
         });
 
-        // 6) Render Survivors & Modal
+        // 6) Render Survivors
         const sGrid = document.getElementById('survivorsGrid');
         sGrid.style.display = 'grid';
         survivors.forEach(r => {
@@ -312,7 +407,7 @@
           card.dataset.status = (r.Status||'all').toLowerCase();
 
           // Killed-by overlay
-          if (r.Status.toLowerCase() === 'dead' && r.KilledBy) {
+          if (r.Status.toLowerCase()==='dead' && r.KilledBy) {
             const death = document.createElement('div');
             death.className = 'death-info';
             death.textContent = `Killed by: ${r.KilledBy}`;
@@ -330,31 +425,30 @@
           nm.style.color = r.Status.toLowerCase()==='dead' ? '#c0392b' : '#27ae60';
           card.appendChild(nm);
 
-          // Modal click
+          // Click opens perks modal
           card.addEventListener('click', () => {
             const ul = document.getElementById('modalPerks');
             ul.innerHTML = '';
 
-            (r.BasePerks || '').split(/\s*,\s*/).filter(p=>p).forEach(perkName => {
+            (r.BasePerks||'').split(/\s*,\s*/).filter(p=>p).forEach(perkName => {
               const li = document.createElement('li');
 
-              // manual override first
-              let desc = manualDescriptions[perkName] || "";
+              // manual override
+              let desc = manualDescriptions[perkName]||"";
 
               if (!desc) {
                 // API fallback
                 const data = perkMap[perkName];
-                desc = data?.template || "";
-                desc = desc.replace(/\{(\d+)\}/g, (_,i) => {
+                desc = data?.template||"";
+                desc = desc.replace(/\{(\d+)\}/g, (_,i)=>{
                   const arr = data.tunables[+i];
-                  return Array.isArray(arr) ? arr[0] : "";
+                  return Array.isArray(arr)?arr[0]:'';
                 })
                 .replace(/<[^>]+>/g,' ')
                 .replace(/\s+/g,' ')
                 .trim();
               }
-
-              if (!desc) desc = "Description unavailable.";
+              if (!desc) desc = 'Description unavailable.';
 
               const title = document.createElement('strong');
               title.textContent = perkName;
@@ -375,24 +469,35 @@
           sGrid.appendChild(card);
         });
 
-        // 7) Filters
+        // 7) Build the kill feed
+        const feedEl = document.getElementById('killFeed');
+        survivors
+          .filter(r => r.Status.toLowerCase()==='dead' && r.KilledAt)
+          .sort((a,b) => new Date(a.KilledAt) - new Date(b.KilledAt))
+          .forEach(r => {
+           const diedPlayer = r.KilledBy;     // your sheet’s “KilledBy” is the player who died
+const killerName = r.Killer || 'Unknown';  // your new “Killer” column
+            const div = document.createElement('div');
+            `${r.KilledAt} – ${r.Survivor} (played by ${diedPlayer}) was killed by ${killerName}`;
+            feedEl.appendChild(div);
+          });
+
+        // 8) Filters
         document.getElementById('controls').addEventListener('click', e => {
           if (!e.target.dataset.filter) return;
           const f = e.target.dataset.filter;
           document.querySelectorAll('#controls button')
-            .forEach(b => b.classList.toggle('active', b.dataset.filter===f));
+            .forEach(b => b.classList.toggle('active', b.dataset.filter === f));
           document.querySelectorAll('.player-card, .survivor-card')
-            .forEach(c => {
-              c.style.display = (f==='all'||c.dataset.status===f?'':'none');
-            });
+            .forEach(c => c.style.display = (f==='all'||c.dataset.status===f?'':'none'));
         });
 
-        // 8) Close modal
+        // 9) Close modal
         document.querySelector('.modal-close').onclick = () => {
           document.getElementById('modal').style.display = 'none';
         };
         document.getElementById('modal').addEventListener('click', e => {
-          if (e.target.id==='modal') e.target.style.display = 'none';
+          if (e.target.id === 'modal') e.target.style.display = 'none';
         });
 
       } catch (err) {
@@ -403,6 +508,7 @@
       }
     }
 
+    // Kick it off
     document.addEventListener('DOMContentLoaded', loadAndRender);
   </script>
 </body>
