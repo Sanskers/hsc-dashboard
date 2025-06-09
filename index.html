@@ -310,6 +310,7 @@
 
     async function loadAndRender() {
       try {
+     
         // 1) Load perks JSON
         const perkMap = {};
         const resp = await fetch(
@@ -332,7 +333,7 @@
         if (!r1.ok || !r2.ok) throw new Error('CSV fetch failed');
         const players   = parseCSV(await r1.text());
         const survivors = parseCSV(await r2.text());
-
+console.log('Survivors data:', survivors);
         document.getElementById('loading').style.display = 'none';
 
         // 4) Compute stats and overall progress
