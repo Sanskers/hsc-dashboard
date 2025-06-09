@@ -309,14 +309,14 @@
             ul.innerHTML = '';
 
             (r.BasePerks || '').split(/\s*,\s*/).filter(p=>p).forEach(name => {
-              const data = perkMap[perkName];
+              const data = perkMap[name];
               const li = document.createElement('li');
 
               if (data?.image) {
   const icon = document.createElement('img');
   // proxy the binary PNG through ThingProxy so CORS isn’t an issue
   icon.src = 'https://thingproxy.freeboard.io/fetch/https://dbd.tricky.lol/' + data.image;
-  icon.alt    = perkName + ' icon';
+  icon.alt    = name + ' icon';
   icon.width  = 32;
   icon.height = 32;
   li.insertBefore(icon, li.firstChild);
