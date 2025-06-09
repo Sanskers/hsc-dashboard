@@ -282,6 +282,12 @@
           };
         });
 
+        // manual overrides for any perks you want to hard-code
+const manualDescriptions = {
+  "Repressed Alliance": 
+    "After repairing generators for 40 seconds, you can call upon The Entity to block the generator you’re working on, preventing an approaching Killer from regressing its progress for 30 seconds."
+};
+
         // 2) Fetch CSVs
         const [r1, r2] = await Promise.all([fetch(CSV_PLAYERS), fetch(CSV_SURVIVORS)]);
         if (!r1.ok || !r2.ok) throw new Error('CSV fetch failed');
@@ -369,31 +375,44 @@
             const ul = document.getElementById('modalPerks');
             ul.innerHTML = '';
 
-            (r.BasePerks || '').split(/\s*,\s*/).filter(p=>p).forEach(perkName => {
-              const data = perkMap[perkName];
-              const li = document.createElement('li');
+            (r.BasePerks || '')
+  .split(/\s*,\s*/)
+  .filter(p => p)
+  .forEach(perkName => {
+    const li = document.createElement('li');
 
-              // Perk name
-              const title = document.createElement('strong');
-              title.textContent = perkName;
-              li.appendChild(title);
+    // 1) Try manual override first
+    let desc = manualDescriptions[perkName];
 
-              // Description with numbers
-              let desc = data?.template || '';
-              desc = desc.replace(/\{(\d+)\}/g, (_,i) => {
-                const arr = data.tunables[+i];
-                return Array.isArray(arr) ? arr[0] : '';
-              });
-              desc = desc.replace(/<[^>]+>/g,' ')
-                         .replace(/\s+/g,' ')
-                         .trim();
+    if (!desc) {
+      // 2) Fallback to your API lookup
+      const lookupKey = lowerMap[perkName.toLowerCase().trim()];
+      const data      = lookupKey ? perkMap[lookupKey] : null;
 
-              const p = document.createElement('p');
-              p.textContent = desc || 'Description unavailable.';
-              li.appendChild(p);
+      desc = data?.template || "";
+      desc = desc
+        .replace(/\{(\d+)\}/g, (_, i) => {
+          const arr = data.tunables[+i];
+          return Array.isArray(arr) ? arr[0] : "";
+        })
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
 
-              ul.appendChild(li);
-            });
+    if (!desc) desc = "Description unavailable.";
+
+    // 3) Build the list item
+    const title = document.createElement("strong");
+    title.textContent = perkName;
+    li.appendChild(title);
+
+    const p = document.createElement("p");
+    p.textContent = desc;
+    li.appendChild(p);
+
+    ul.appendChild(li);
+  });
 
             document.getElementById('modalTitle').textContent = r.Survivor;
             document.getElementById('modalImg').src = r.ImageURL;
