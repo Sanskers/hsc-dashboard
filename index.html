@@ -293,7 +293,7 @@
           perkDataMap[p.name] = {
             template: p.description,
             tunables: p.tunables,
-            image:     p.image    // image field from the API 
+            image:     p.image
           };
         });
 
@@ -399,12 +399,13 @@
               const li = document.createElement('li');
 
               const data = perkDataMap[perkName];
-              // icon via CORS proxy
+              // icon via Codetabs proxy to bypass CORS
               if (data && data.image) {
                 const icon = document.createElement('img');
-                icon.src = 'https://corsproxy.io/?' + encodeURIComponent('https://dbd.tricky.lol/' + data.image);
+                icon.src = 'https://api.codetabs.com/v1/proxy?quest=' +
+                  encodeURIComponent('https://dbd.tricky.lol/' + data.image);
                 icon.alt = perkName + ' icon';
-                icon.style.width = '32px';
+                icon.style.width  = '32px';
                 icon.style.height = '32px';
                 li.appendChild(icon);
               }
@@ -413,12 +414,17 @@
               title.textContent = perkName;
               li.appendChild(title);
 
+              // inject tier-1 tunable values
               let desc = data?.template || '';
               desc = desc.replace(/\{(\d+)\}/g, (_, idx) => {
                 const arr = data.tunables[+idx];
                 return (arr && arr[0] != null) ? arr[0] : '';
               });
-              desc = desc.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+              // strip HTML & collapse whitespace
+              desc = desc
+                .replace(/<[^>]+>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
 
               const p = document.createElement('p');
               p.textContent = desc || 'Description unavailable.';
@@ -430,8 +436,8 @@
             });
 
             document.getElementById('modalTitle').textContent = Survivor;
-            document.getElementById('modalImg').src = ImageURL;
-            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modalImg').src           = ImageURL;
+            document.getElementById('modal').style.display    = 'flex';
           });
 
           sGrid.appendChild(card);
