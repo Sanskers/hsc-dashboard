@@ -15,13 +15,14 @@
 
     /* ─ Container ────────────────────────────────────────────────────── */
     .container {
-      max-width: 960px;
-      margin: 40px auto;
-      padding: 20px;
-      background: rgba(255,255,255,0.6); /* more transparent */
-      border-radius: 8px;
-      position: relative;
-    }
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 960px;    /* fixed pixel width */
+  height: calc(100vh - 40px);
+  overflow: auto;
+}
+
 
     /* ─ Overall Progress Bar ────────────────────────────────────────── */
     #overallProgressContainer {
@@ -181,19 +182,13 @@
   flex: 3; /* existing grid styles stay */
 }
 
-/* Sidebar kill-feed on the right side of the page */
 #killFeedContainer {
   position: fixed;
-  top: 200px;           /* adjust vertical offset to line up with survivors grid */
-  right: 100px;          /* distance from browser’s right edge */
-  width: 500px;         /* or whatever width you like */
-  background: rgba(255,255,255,0.4);
-  border-radius: 6px;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  max-height: calc(100vh - 240px);
+  top: 20px;
+  right: 20px;
+  width: 300px;    /* fixed width so it doesn’t reflow */
+  height: calc(100vh - 40px);
   overflow-y: auto;
-  z-index: 500;
 }
 #killFeedContainer h2 {
   margin-top: 0;
