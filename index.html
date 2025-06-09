@@ -8,15 +8,18 @@
     body, html {
       margin: 0; padding: 0;
       font-family: Arial, sans-serif;
-      background: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg") no-repeat center/cover fixed;
+      background: url("https://deadbydaylight.com/static/a5cdc5db3804f817df112184c81f5ead/93f85/dbd-gallery-background.jpg")
+                  no-repeat center/cover fixed;
       color: #333;
     }
+
     /* Container */
     .container {
       max-width: 960px; margin: 40px auto; padding: 20px;
       background: rgba(255,255,255,0.9); border-radius: 8px;
       position: relative;
     }
+
     /* Header: Rules on left, Title centered */
     .header {
       display: flex; align-items: center; justify-content: space-between;
@@ -25,8 +28,9 @@
       margin: 0; flex: 1; text-align: center; font-size: 1.8rem;
     }
     .header .btn {
-      margin: 0; flex: 0 0 auto;
+      flex: 0 0 auto;
     }
+
     /* Buttons */
     .btn, #controls button {
       padding: 0.5rem 1rem; background: #3498db; color: #fff;
@@ -34,10 +38,12 @@
     }
     .btn:hover, #controls button:hover { background: #2980b9; }
     #controls button.active { background: #2980b9; }
+
     /* Stats & Filters */
     #stats { text-align: center; font-weight: bold; margin: 20px 0; }
     #stats span { margin: 0 10px; }
     #controls { text-align: center; margin-bottom: 20px; }
+
     /* Loading & Error */
     #loading { text-align: center; margin-top: 60px; }
     .spinner {
@@ -46,74 +52,89 @@
       animation: spin 1s linear infinite; margin: 0 auto 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #error { display: none; text-align:center; color:#e74c3c; margin-top:40px; }
+    #error {
+      display: none; text-align: center; color: #e74c3c; margin-top: 40px;
+    }
+
     /* Players Grid */
-    .players-grid { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+    .players-grid {
+      display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+    }
     .player-card {
-      width:220px; background:#fff; border-radius:8px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow:visible;
-      display:flex; flex-direction:column; transition:transform .15s;
+      width: 220px; background: #fff; border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: visible; display: flex; flex-direction: column;
+      transition: transform .15s ease;
     }
     .player-card:hover { transform: translateY(-4px); }
     .img-container {
-      position:relative; width:100%; height:200px; background:#ddd; overflow:visible;
+      position: relative; width: 100%; height: 200px; background: #ddd;
+      overflow: visible;
     }
-    .img-container img { width:100%; height:100%; object-fit:cover; }
+    .img-container img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
     .pip-overlay {
-      position:absolute; top:75%; left:50%;
-      transform: translateX(-50%); display:flex; pointer-events:none;
+      position: absolute; top: 75%; left: 50%;
+      transform: translateX(-50%); display: flex; pointer-events: none;
     }
     .pip-overlay img {
-      width:60px; height:60px; margin-left:-20px;
+      width: 60px; height: 60px; margin-left: -20px;
     }
-    .pip-overlay img:first-child { margin-left:0; }
+    .pip-overlay img:first-child { margin-left: 0; }
     .player-card-content {
-      padding:12px 16px; display:flex; flex-direction:column; gap:4px;
+      padding: 12px 16px; display: flex; flex-direction: column; gap: 4px;
     }
-    .player-name { font-size:1.2rem; font-weight:bold; text-align:center; }
+    .player-name {
+      font-size: 1.2rem; font-weight: bold; text-align: center;
+    }
+
     /* Survivors Grid */
     .survivors-grid {
-      display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-      gap:12px; margin-top:30px; justify-items:center;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+      gap: 12px; margin-top: 30px; justify-items: center;
     }
     .survivor-card {
-      width:100px; background:#fff; border-radius:6px;
-      box-shadow:0 1px 6px rgba(0,0,0,0.08); cursor:pointer;
-      text-align:center;
+      width: 100px; background: #fff; border-radius: 6px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08); cursor: pointer;
+      text-align: center;
     }
     .survivor-card img {
-      width:100%; height:100px; object-fit:cover; background:#ddd;
+      width: 100%; height: 100px; object-fit: cover; background: #ddd;
     }
     .survivor-name {
-      font-size:0.75rem; padding:4px 2px;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      font-size: 0.75rem; padding: 4px 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+
     /* Modal */
     .modal {
-      position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.7); display:none;
-      align-items:center; justify-content:center; z-index:1000;
+      position: fixed; top: 0; left: 0; width:100%; height:100%;
+      background: rgba(0,0,0,0.7); display: none;
+      align-items: center; justify-content: center; z-index: 1000;
     }
     .modal-content {
-      background:#fff; border-radius:8px; padding:20px;
-      width:90%; max-width:360px; text-align:center; position:relative;
+      background: #fff; border-radius: 8px; padding: 20px;
+      width: 90%; max-width: 360px; text-align: center;
+      position: relative;
     }
     .modal-close {
-      position:absolute; top:8px; right:12px;
-      font-size:1.5rem; cursor:pointer;
+      position: absolute; top: 8px; right: 12px;
+      font-size: 1.5rem; cursor: pointer;
     }
     .modal-content img {
-      width:120px; height:120px; object-fit:cover;
-      border-radius:6px; margin-bottom:12px;
+      width: 120px; height: 120px; object-fit: cover;
+      border-radius: 6px; margin-bottom: 12px;
     }
     .modal-content ul {
-      list-style:none; padding:0; margin:0; text-align:left;
+      list-style: none; padding: 0; margin: 0; text-align: left;
     }
     .modal-content li {
-      margin:6px 0; display:flex; align-items:flex-start;
+      margin: 6px 0; display: flex; align-items: flex-start;
     }
     .modal-content li img {
-      margin-right:8px; flex-shrink:0; width:32px; height:32px;
+      margin-right: 8px; flex-shrink: 0; width: 32px; height: 32px;
     }
   </style>
 </head>
@@ -185,7 +206,7 @@
 
     async function loadAndRender() {
       try {
-        // 1) Preload perks JSON via Codetabs proxy
+        // 1) Preload perks JSON
         const perkMap = {};
         const resp = await fetch(
           'https://api.codetabs.com/v1/proxy?quest=' +
@@ -265,7 +286,7 @@
           pGrid.appendChild(card);
         });
 
-        // 5) Render Survivors & Modal (with wiki‐sourced icons)
+        // 5) Render Survivors & Modal (with AllOrigins‐proxied icons)
         const sGrid = document.getElementById('survivorsGrid');
         sGrid.style.display = 'grid';
         survivors.forEach(r => {
@@ -273,9 +294,9 @@
           card.className = 'survivor-card';
           card.dataset.status = (r.Status||'all').toLowerCase();
 
-          const img = document.createElement('img');
-          img.src = r.ImageURL; img.alt = r.Survivor;
-          card.appendChild(img);
+          const imgEl = document.createElement('img');
+          imgEl.src = r.ImageURL; imgEl.alt = r.Survivor;
+          card.appendChild(imgEl);
 
           const nm = document.createElement('div');
           nm.className = 'survivor-name';
@@ -288,48 +309,30 @@
             ul.innerHTML = '';
 
             (r.BasePerks || '').split(/\s*,\s*/).filter(p=>p).forEach(name => {
-              const li = document.createElement('li');
               const data = perkMap[name];
+              const li = document.createElement('li');
 
               if (data?.image) {
-                // Fetch the icon URL via Fandom API (with origin=* for CORS)
-                const file = data.image.split('/').pop();
-                fetch(
-                  'https://deadbydaylight.fandom.com/api.php' +
-                  '?action=query&format=json&prop=imageinfo&iiprop=url' +
-                  '&titles=' + encodeURIComponent('File:' + file) +
-                  '&origin=*'
-                )
-                .then(r => r.json())
-                .then(js => {
-                  const pages = js.query.pages;
-                  const pg = pages[Object.keys(pages)[0]];
-                  const url = pg.imageinfo?.[0]?.url;
-                  if (url) {
-                    const ic = document.createElement('img');
-                    ic.src = url;
-                    ic.alt = name + ' icon';
-                    ic.width = 32;
-                    ic.height = 32;
-                    li.insertBefore(ic, li.firstChild);
-                  }
-                })
-                .catch(console.warn);
+                const icon = document.createElement('img');
+                icon.src = 'https://api.allorigins.win/raw?url=' +
+                  encodeURIComponent('https://dbd.tricky.lol/' + data.image);
+                icon.alt = name + ' icon';
+                icon.width = 32;
+                icon.height = 32;
+                li.appendChild(icon);
               }
 
-              // Perk name
               const title = document.createElement('strong');
               title.textContent = name;
               li.appendChild(title);
 
-              // Description with tier-1 numbers injected
               let desc = data?.template || '';
-              desc = desc.replace(/\{(\d+)\}/g, (_,i) => {
+              desc = desc.replace(/\{(\d+)\}/g, (_,i)=>{
                 const arr = data.tunables[+i];
                 return Array.isArray(arr) ? arr[0] : '';
               });
-              desc = desc.replace(/<[^>]+>/g, ' ')
-                         .replace(/\s+/g, ' ')
+              desc = desc.replace(/<[^>]+>/g,' ')
+                         .replace(/\s+/g,' ')
                          .trim();
 
               const p = document.createElement('p');
@@ -354,19 +357,17 @@
           if (!e.target.dataset.filter) return;
           const f = e.target.dataset.filter;
           document.querySelectorAll('#controls button')
-            .forEach(b => b.classList.toggle('active', b.dataset.filter===f));
-          document.querySelectorAll('.player-card, .survivor-card')
-            .forEach(c => {
-              c.style.display = (f==='all' || c.dataset.status===f) ? '' : 'none';
-            });
+            .forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
+          document.querySelectorAll('.player-card,.survivor-card')
+            .forEach(c=>c.style.display = (f==='all'||c.dataset.status===f?'':'none'));
         });
 
         // 7) Close modal
-        document.querySelector('.modal-close').onclick = () => {
+        document.querySelector('.modal-close').onclick = ()=>{
           document.getElementById('modal').style.display = 'none';
         };
-        document.getElementById('modal').addEventListener('click', e => {
-          if (e.target.id === 'modal') e.target.style.display = 'none';
+        document.getElementById('modal').addEventListener('click', e=>{
+          if (e.target.id==='modal') e.target.style.display='none';
         });
 
       } catch (err) {
