@@ -470,18 +470,24 @@ console.log('Survivors data:', survivors);
           sGrid.appendChild(card);
         });
 
-        // 7) Build the kill feed
-        const feedEl = document.getElementById('killFeed');
-        survivors
-          .filter(r => r.Status.toLowerCase()==='dead' && r.KilledAt)
-          .sort((a,b) => new Date(a.KilledAt) - new Date(b.KilledAt))
-          .forEach(r => {
-           const diedPlayer = r.KilledBy;     // your sheet’s “KilledBy” is the player who died
-const killerName = r.Killer || 'Unknown';  // your new “Killer” column
-            const div = document.createElement('div');
-            `${r.KilledAt} – ${r.Survivor} (played by ${diedPlayer}) was killed by ${killerName}`;
-            feedEl.appendChild(div);
-          });
+        // 7) Build the kill feed (with debug)
+const feedEl = document.getElementById('killFeed');
+
+// first filter out dead entries with a timestamp
+const deadEntries = survivors.filter(r =>
+  r.Status.toLowerCase() === 'dead' && r.KilledAt
+);
+console.log('Dead entries:', deadEntries);
+
+// now sort & render them
+deadEntries
+  .sort((a,b) => new Date(a.KilledAt) - new Date(b.KilledAt))
+  .forEach(r => {
+    const div = document.createElement('div');
+    div.textContent =
+      `${r.KilledAt} – ${r.Survivor} (played by ${r.KilledBy}) was killed by ${r.Killer}`;
+    feedEl.appendChild(div);
+  });
 
         // 8) Filters
         document.getElementById('controls').addEventListener('click', e => {
