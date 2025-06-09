@@ -293,7 +293,7 @@
           perkDataMap[p.name] = {
             template: p.description,
             tunables: p.tunables,
-            image:     p.image
+            image:     p.image    // image field from the API 
           };
         });
 
@@ -392,17 +392,17 @@
           card.addEventListener('click', () => {
             const perksRaw  = BasePerks || '';
             const perksList = perksRaw.split(/\s*,\s*/).filter(p => p);
-            const ul = document.getElementById('modalPerks');
+            const ul        = document.getElementById('modalPerks');
             ul.innerHTML = '';
 
             perksList.forEach(perkName => {
               const li = document.createElement('li');
 
               const data = perkDataMap[perkName];
-              // icon
+              // icon via CORS proxy
               if (data && data.image) {
                 const icon = document.createElement('img');
-                icon.src = 'https://dbd.tricky.lol/' + data.image;
+                icon.src = 'https://corsproxy.io/?' + encodeURIComponent('https://dbd.tricky.lol/' + data.image);
                 icon.alt = perkName + ' icon';
                 icon.style.width = '32px';
                 icon.style.height = '32px';
@@ -413,16 +413,12 @@
               title.textContent = perkName;
               li.appendChild(title);
 
-              // inject tier-1 tunable values
               let desc = data?.template || '';
               desc = desc.replace(/\{(\d+)\}/g, (_, idx) => {
                 const arr = data.tunables[+idx];
                 return (arr && arr[0] != null) ? arr[0] : '';
               });
-              // remove HTML tags & collapse whitespace
-              desc = desc.replace(/<[^>]+>/g, ' ')
-                         .replace(/\s+/g, ' ')
-                         .trim();
+              desc = desc.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
               const p = document.createElement('p');
               p.textContent = desc || 'Description unavailable.';
