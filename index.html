@@ -309,7 +309,7 @@
             ul.innerHTML = '';
 
             (r.BasePerks || '').split(/\s*,\s*/).filter(p=>p).forEach(name => {
-              const data = perkMap[name];
+              const data = perkMap[perkName];
               const li = document.createElement('li');
 
               if (data?.image) {
