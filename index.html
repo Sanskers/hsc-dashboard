@@ -149,13 +149,20 @@
       box-shadow: 0 1px 6px rgba(0,0,0,0.08);
       cursor: pointer; text-align: center;
     }
-    /* Killed-by overlay */
     .survivor-card .death-info {
-      position: absolute; top: 0; left: 0; width: 100%;
-      background: rgba(255,255,255,0.85);
-      color: #c0392b; font-size: 0.7rem; font-weight: bold;
-      padding: 2px 0; pointer-events: none;
-    }
+  position: absolute;
+  top: 18px;               /* push it down below the prestige banner */
+  left: 0;
+  width: 100%;
+  background: rgba(231,76,60,0.85);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 0;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+}
     .survivor-card .prestige-info {
   position: absolute;
   top: 0px;         /* just below the very top edge */
