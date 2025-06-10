@@ -273,34 +273,10 @@
       <h3>Base Perks</h3>
       <ul id="modalPerks"></ul>
     </div>
+    
   </div>
 
-  /* Wrap survivors + feed side-by-side */
-.main-content {
-  display: flex;
-  gap: 20px;
-  margin-top: 30px;
-}
-
-/* Survivors take up 3x the space of the feed */
-.survivors-grid {
-  flex: 3; /* existing grid styles stay */
-}
-
-/* Kill feed on the right */
-#killFeedContainer {
-  flex: 1;
-  max-width: 300px; /* optional cap */
-  background: rgba(255,255,255,0.8);
-  border-radius: 6px;
-  padding: 10px;
-  height: fit-content; /* shrink to content */
-}
-/* Make kill feed scroll if it overflows */
-#killFeed {
-  max-height: 400px;
-  overflow-y: auto;
-}
+ 
   
   <script>
     // CSV parsing helpers
