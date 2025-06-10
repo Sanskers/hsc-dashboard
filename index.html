@@ -351,10 +351,8 @@ console.log('Survivors data:', survivors);
         document.getElementById('loading').style.display = 'none';
 
         // 4) Compute stats and overall progress
-        const totalPips  = players.reduce((sum,r)=>sum+(+r.Pips||0),0);
         const aliveCount = survivors.filter(r=>r.Status?.toLowerCase()==='alive').length;
         const deadCount  = survivors.length - aliveCount;
-        document.getElementById('totalPips').textContent  = totalPips;
         document.getElementById('aliveCount').textContent = aliveCount;
         document.getElementById('deadCount').textContent  = deadCount;
 
