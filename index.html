@@ -19,7 +19,6 @@
   top: 20px;
   left: 20px;
   width: 960px;    /* fixed pixel width */
-  overflow: auto;
 }
 
 
@@ -347,8 +346,7 @@
         if (!r1.ok || !r2.ok) throw new Error('CSV fetch failed');
         const players   = parseCSV(await r1.text());
         const survivors = parseCSV(await r2.text());
-console.log('Survivors data:', survivors);
-        document.getElementById('loading').style.display = 'none';
+
 
         // 4) Compute stats and overall progress
         const totalPips  = players.reduce((sum,r)=>sum+(+r.Pips||0),0);
@@ -487,7 +485,7 @@ const feedEl = document.getElementById('killFeed');
 const deadEntries = survivors.filter(r =>
   r.Status.toLowerCase() === 'dead' && r.KilledAt
 );
-console.log('Dead entries:', deadEntries);
+
 
 // now sort & render them
 deadEntries
