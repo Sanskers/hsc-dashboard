@@ -156,6 +156,20 @@
       color: #c0392b; font-size: 0.7rem; font-weight: bold;
       padding: 2px 0; pointer-events: none;
     }
+    .survivor-card .prestige-info {
+  position: absolute;
+  top: 2px;         /* just below the very top edge */
+  left: 0;
+  width: 100%;
+  background: rgba(255,215,0,0.85); /* goldish */
+  color: #333;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 0;
+  text-align: center;
+  pointer-events: none;
+}
+
     .survivor-card img {
       width: 100%; height: 100px;
       object-fit: cover; background: #ddd;
@@ -422,6 +436,14 @@ console.log('Survivors data:', survivors);
             death.textContent = `Killed by: ${r.KilledBy}`;
             card.appendChild(death);
           }
+          
+// if PrestigedBy has a value, overlay a gold banner
+if (r.PrestigedBy) {
+  const pr = document.createElement('div');
+  pr.className = 'prestige-info';
+  pr.textContent = `Prestiged by: ${r.PrestigedBy}`;
+  card.appendChild(pr);
+}
 
           // Portrait & name
           const imgEl = document.createElement('img');
