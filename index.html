@@ -495,8 +495,20 @@ deadEntries
   .sort((a,b) => new Date(a.KilledAt) - new Date(b.KilledAt))
   .forEach(r => {
     const div = document.createElement('div');
-    div.textContent =
-      `${r.KilledAt} – ${r.Survivor} (played by ${r.KilledBy}) was killed by ${r.Killer}`;
+    // parse ISO string into a Date
+const dt = new Date(r.KilledAt);
+// format it nicely, e.g. "6/9/2025, 5:21:00 PM"
+const niceTs = dt.toLocaleString(undefined, {
+  year:   'numeric',
+  month:  'numeric',
+  day:    'numeric',
+  hour:   'numeric',
+  minute: '2-digit',
+  second: '2-digit'
+});
+
+div.textContent =
+  `${niceTs} – ${r.Survivor} (played by ${r.KilledBy}) was killed by ${r.Killer}`;
     feedEl.appendChild(div);
   });
 
