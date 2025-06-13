@@ -4,15 +4,14 @@
   <meta charset="UTF-8" />
   <title>HSC Player Overlay</title>
   <style>
-    /* full transparency for OBS */
+    /* transparent background for OBS */
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background: transparent;
       overflow: hidden;
     }
 
-    /* grid container */
+    /* container for all cards */
     #overlayGrid {
       display: flex;
       flex-wrap: wrap;
@@ -24,30 +23,22 @@
     .player-card-overlay {
       position: relative;
       width: 80px;
-      height: 80px;
       background: transparent;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-shadow: 0 0 2px rgba(0,0,0,0.8);
     }
+    /* portrait */
     .player-card-overlay img {
       width: 100%;
-      height: 100%;
+      height: 80px;
       object-fit: cover;
       border-radius: 4px;
     }
-    /* greyed‐out dead state */
+    /* grey out dead */
     .player-card-overlay[data-status="dead"] img {
       filter: grayscale(100%) opacity(0.5);
-    }
-
-    /* player name label */
-    .player-name-overlay {
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 100%;
-      text-align: center;
-      font-size: 0.6rem;
-      color: #fff;
-      text-shadow: 0 0 2px rgba(0,0,0,0.8);
-      pointer-events: none;
     }
 
     /* pip icons */
@@ -62,55 +53,70 @@
       height: 12px;
       margin-left: -4px;
     }
+
+    /* text area under portrait */
+    .player-details-overlay {
+      margin-top: 2px;
+      font-size: 0.6rem;
+      line-height: 1.1;
+      pointer-events: none;
+    }
+    .player-details-overlay div {
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   </style>
 </head>
 <body>
   <div id="overlayGrid"></div>
 
   <script>
-    // CSV‐split helper
+    // CSV split helper
     function splitCSVLine(line) {
       const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
       const arr = [];
       let m;
       while ((m = re.exec(line))) {
-        arr.push(
-          m[1] !== undefined
-            ? m[1].replace(/""/g, '"')
-            : m[2]
+        arr.push(m[1] !== undefined
+          ? m[1].replace(/""/g, '"')
+          : m[2]
         );
       }
       return arr;
     }
 
-    // Main render
     async function renderOverlay() {
-      const CSV_PLAYERS = 
+      const CSV_PLAYERS =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
+
       const resp = await fetch(CSV_PLAYERS);
       const text = await resp.text();
       const lines = text.trim().split('\n');
-      if (lines.length < 2) return;  // no data
+      if (lines.length < 2) return;
 
-      // parse header
-      const headers = splitCSVLine(lines.shift());
-      const idxPlayer = headers.indexOf('Player');
-      const idxImage  = headers.indexOf('ImageURL');
-      const idxStatus = headers.indexOf('Status');
-      const idxPips   = headers.indexOf('Pips');
+      const headers    = splitCSVLine(lines.shift());
+      const iPlayer    = headers.indexOf('Player');
+      const iImage     = headers.indexOf('ImageURL');
+      const iStatus    = headers.indexOf('Status');
+      const iPips      = headers.indexOf('Pips');
+      const iRank      = headers.indexOf('Rank');
+      const iPerks     = headers.indexOf('PerksAllowed'); // adjust if your header is 'Perks'
 
       const grid = document.getElementById('overlayGrid');
 
-      // render each row
       lines.forEach(line => {
         const cols   = splitCSVLine(line);
-        const name   = cols[idxPlayer] || '';
-        const imgURL = cols[idxImage]  || '';
-        const status = (cols[idxStatus] || '').toLowerCase();
-        const pips   = parseInt(cols[idxPips], 10) || 0;
+        const name   = cols[iPlayer] || '';
+        const imgURL = cols[iImage]  || '';
+        const status = (cols[iStatus] || '').toLowerCase();
+        const pips   = parseInt(cols[iPips], 10) || 0;
+        const rank   = cols[iRank]   || '';
+        const perks  = cols[iPerks]  || '';
 
         const card = document.createElement('div');
-        card.className = 'player-card-overlay';
+        card.className      = 'player-card-overlay';
         card.dataset.status = status;
 
         // portrait
@@ -119,7 +125,7 @@
         img.alt = name;
         card.appendChild(img);
 
-        // pips
+        // pips overlay
         const pipContainer = document.createElement('div');
         pipContainer.className = 'pip-overlay';
         for (let i = 0; i < pips; i++) {
@@ -129,17 +135,21 @@
         }
         card.appendChild(pipContainer);
 
-        // name label
-        const label = document.createElement('div');
-        label.className = 'player-name-overlay';
-        label.textContent = name;
-        card.appendChild(label);
+        // details under image
+        const details = document.createElement('div');
+        details.className = 'player-details-overlay';
+        details.innerHTML = `
+          <div>${name}</div>
+          <div>Rank: ${rank}</div>
+          <div>Pips: ${pips}</div>
+          <div style="white-space:normal;">${perks}</div>
+        `;
+        card.appendChild(details);
 
         grid.appendChild(card);
       });
     }
 
-    // kick it off
     renderOverlay();
   </script>
 </body>
