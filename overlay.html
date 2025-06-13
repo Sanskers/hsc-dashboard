@@ -67,13 +67,18 @@
   <script>
     // simple CSV line splitter
     function splitCSVLine(line) {
-      const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
-      const arr = [], m;
-      while (m = re.exec(line)) {
-        arr.push(m[1] !== undefined ? m[1].replace(/""/g, '"') : m[2]);
-      }
-      return arr;
-    }
+  const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
+- const arr = [], m;
++  const arr = [];
++  let m;
+  while (m = re.exec(line)) {
+    arr.push(m[1] !== undefined
+      ? m[1].replace(/""/g, '"')
+      : m[2]
+    );
+  }
+  return arr;
+}
 
     async function renderOverlay() {
       const CSV_PLAYERS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
