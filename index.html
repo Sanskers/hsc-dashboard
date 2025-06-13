@@ -556,14 +556,14 @@ div.textContent =
           if (e.target.id === 'modal') e.target.style.display = 'none';
         });
 
-         catch (err) {
+      } catch (err) {
     console.error('Load/render error:', err);
     document.getElementById('loading').style.display = 'none';
     const e = document.getElementById('error');
     e.style.display = 'block';
     e.textContent = 'Error loading data: ' + err.message;
   }
-
+    }
 
     // Kick it off
     document.addEventListener('DOMContentLoaded', loadAndRender);
