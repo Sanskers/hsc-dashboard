@@ -318,23 +318,48 @@
   
   <script>
     /**
- * Very simple CSV → Array of Objects.
- * Assumes no embedded commas or quoted fields.
+/**
+ * Splits one CSV line into fields, ignoring commas inside quotes.
+ */
+function splitCSVLine(line) {
+  // matches either "quoted strings (with "" escapes)" or unquoted fields (no commas)
+  const re = /(?:"([^"]*(?:""[^"]*)*)"|([^",]+)|,)(?=(?:,|$))/g;
+  const fields = [];
+  let match;
+  while (match = re.exec(line)) {
+    if (match[0] === ",") {
+      // empty field
+      fields.push("");
+    } else if (match[1] !== undefined) {
+      // quoted field, unescape double quotes
+      fields.push(match[1].replace(/""/g, '"'));
+    } else {
+      // unquoted field
+      fields.push((match[2]||"").trim());
+    }
+  }
+  return fields;
+}
+
+/**
+ * Turns a CSV text blob into an array of row‐objects keyed by header.
  */
 function parseCSV(text) {
-  const lines  = text.trim().split('\n');
-  const header = lines.shift().split(',').map(h=>h.trim());
+  const lines   = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = splitCSVLine(lines.shift()).map(h => h.trim());
   return lines
-    .filter(l=>l.trim())
+    .filter(l => l.trim() !== "")
     .map(line => {
-      const cols = line.split(',');
+      const cols = splitCSVLine(line);
       const obj  = {};
-      header.forEach((h,i) => {
-        obj[h] = (cols[i]||'').trim();
+      headers.forEach((h,i) => {
+        obj[h] = cols[i] !== undefined ? cols[i] : "";
       });
       return obj;
     });
 }
+
 
 
     // CSV URLs
