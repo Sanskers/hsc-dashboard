@@ -394,6 +394,10 @@ function parseCSV(text) {
 console.log('Survivors data:', survivors);
         document.getElementById('loading').style.display = 'none';
 
+        // remove any “empty” rows without a real Player or Survivor
+const cleanPlayers   = players.filter(r => r.Player   && r.Player.trim());
+const cleanSurvivors = survivors.filter(r => r.Survivor && r.Survivor.trim());
+
         // 4) Compute stats and overall progress
         const aliveCount = survivors.filter(r=>r.Status?.toLowerCase()==='alive').length;
         const deadCount  = survivors.length - aliveCount;
@@ -405,7 +409,7 @@ console.log('Survivors data:', survivors);
         // 5) Render Players
         const pGrid = document.getElementById('playersGrid');
         pGrid.style.display = 'flex';
-        players.forEach(r => {
+        cleanPlayers.forEach(r => {
           const card = document.createElement('div');
           card.className = 'player-card';
           card.dataset.status = (r.Status||'all').toLowerCase();
