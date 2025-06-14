@@ -317,27 +317,25 @@
  
   
   <script>
-    // CSV parsing helpers
-    function splitCSVLine(line) {
-      const re = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
-      const arr = []; let m;
-      while (m = re.exec(line)) {
-        arr.push(m[1] !== undefined
-          ? m[1].replace(/""/g, '"')
-          : m[2]
-        );
-      }
-      return arr;
-    }
-    function parseCSV(text) {
-      const lines = text.trim().split('\n');
-      const headers = splitCSVLine(lines[0]);
-      return lines.slice(1).filter(l => l).map(l => {
-        const cols = splitCSVLine(l), obj = {};
-        headers.forEach((h,i) => obj[h.trim()] = (cols[i]||'').trim());
-        return obj;
+    /**
+ * Very simple CSV → Array of Objects.
+ * Assumes no embedded commas or quoted fields.
+ */
+function parseCSV(text) {
+  const lines  = text.trim().split('\n');
+  const header = lines.shift().split(',').map(h=>h.trim());
+  return lines
+    .filter(l=>l.trim())
+    .map(line => {
+      const cols = line.split(',');
+      const obj  = {};
+      header.forEach((h,i) => {
+        obj[h] = (cols[i]||'').trim();
       });
-    }
+      return obj;
+    });
+}
+
 
     // CSV URLs
     const CSV_PLAYERS   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuKBNjFUHOp6l8oLtOFIxIUkZUmXk0fyKkYtSrREuIlrOn8iJsZOEsvU0W0M3BUdiWdZ3kSHo66-iJ/pub?gid=0&single=true&output=csv';
